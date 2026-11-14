@@ -63,6 +63,19 @@ const router = createRouter({
           name: 'notifications',
           component: () => import('@/pages/user/Notifications.vue'),
           meta: { auth: true }
+        },
+        //HU-12: check-in SANTIAGO
+        {
+          path: 'organizador/asistentes',
+          name: 'organizer-attendees',
+          component: () => import('@/pages/organizer/Attendees.vue'),
+          meta: { auth: true }
+        },
+        {
+          path: 'organizador/checkin/:eventoId',
+          name: 'organizer-checkin',
+          component: () => import('@/pages/organizer/CheckIn.vue'),
+          meta: { auth: true }
         }
       ]
     },

@@ -57,13 +57,13 @@ onMounted(load)
           Pendiente de reembolso · {{ item.cancellationReason }}
         </p>
         <q-btn
-          no-caps
-          outline
-          color="primary"
-          label="Mostrar QR"
-          :disable="item.status !== 'Válida' || item.eventStatus === 'Cancelado'"
-          @click="showQR(item)"
-        />
+            no-caps
+            outline
+            color="primary"
+            label="Mostrar QR"
+            :disable="(item.status !== 'Valida' && item.status !== 'Válida') || item.eventStatus === 'Cancelado'"
+            @click="showQR(item)"
+          />
         <router-link :to="'/evento/' + item.eventId">Ver evento</router-link>
       </article>
     </div>

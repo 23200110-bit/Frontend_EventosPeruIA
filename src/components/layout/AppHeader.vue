@@ -27,6 +27,9 @@ function logout() {
         <router-link to="/asistente"><q-icon name="auto_awesome" /> Asistente IA</router-link>
         <router-link v-if="session.user" to="/recomendaciones">Para ti</router-link>
         <router-link v-if="session.user" to="/entradas">Mis entradas</router-link>
+        <!-- SANTIAGO CHECK-IN -->
+        <router-link v-if="session.user" to="/organizador/asistentes">Check-in Puerta</router-link>
+        <!-- ---------------- -->
         <router-link v-if="session.user" to="/avisos">Avisos</router-link>
       </nav>
 
@@ -44,6 +47,9 @@ function logout() {
         <router-link to="/recomendaciones" @click="menu = false">Para ti</router-link>
         <router-link to="/perfil" @click="menu = false">Perfil</router-link>
         <router-link to="/entradas" @click="menu = false">Mis entradas</router-link>
+        <!-- SANTIAGO CHECK-IN -->
+        <router-link to="/organizador/asistentes" @click="menu = false">Check-in Puerta</router-link>
+        <!-- ---------------- -->
         <router-link to="/avisos" @click="menu = false">Avisos</router-link>
       </template>
       <router-link v-else to="/login" @click="menu = false">Iniciar sesión</router-link>

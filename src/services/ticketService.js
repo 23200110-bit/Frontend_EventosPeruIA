@@ -2,10 +2,14 @@ import { get, post } from './httpClient'
 
 export const ticketService = {
   getMyTickets() {
-    return get('/my/tickets')
+    return get('/entradas/mis-entradas')
   },
 
-  //HU-12: check-in SANTIAGO
+  getVoucher(entradaId) {
+    return get(`/entradas/${entradaId}/voucher`)
+  },
+
+  // HU-12: check-in SANTIAGO
   validateQr(payload) {
     return post('/tickets/validate-qr', payload)
   }

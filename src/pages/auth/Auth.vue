@@ -41,12 +41,7 @@ async function submit() {
       message.value = 'Tu cuenta está lista. Inicia sesión para comenzar.'
     } else {
       signIn(await authService.login(credentials))
-      const next = route.query.next
-      await router.push(
-        typeof next === 'string' && next.startsWith('/') && !next.startsWith('//')
-          ? next
-          : '/explorar'
-      )
+      await router.push('/')
     }
   } catch (failure) {
     error.value = failure.message

@@ -1,10 +1,27 @@
 import { reactive } from 'vue'
 import { resetChat } from './chatStore'
 
-// Memoria de la pestaña: no se guardan tokens ni contraseñas en localStorage.
+const STORAGE_KEY = 'eventosperu_session'
+
+function loadInitialSession() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    if (!raw) return { token: '', user: null }
+    const parsed = JSON.parse(raw)
+    return {
+      token: parsed?.token || '',
+      user: parsed?.user || null
+    }
+  } catch {
+    return { token: '', user: null }
+  }
+}
+
+const initial = loadInitialSession()
+
 export const session = reactive({
-  token: '',
-  user: null
+  token: initial.token,
+  user: initial.user
 })
 
 export function signIn(result) {
@@ -13,11 +30,16 @@ export function signIn(result) {
   }
   session.token = result.accessToken
   session.user = result.user
+  sessionStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ token: result.accessToken, user: result.user })
+  )
   resetChat()
 }
 
 export function signOut() {
   session.token = ''
   session.user = null
+  sessionStorage.removeItem(STORAGE_KEY)
   resetChat()
 }

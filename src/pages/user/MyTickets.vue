@@ -1,73 +1,161 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import QRCode from 'qrcode'
+import { onMounted } from 'vue'
+import TicketCard from '@/components/tickets/TicketCard.vue'
 import TicketQrModal from '@/components/tickets/TicketQrModal.vue'
-import { ticketService } from '@/services/ticketService'
-import { date, money } from '@/utils/formatters'
+import { useTicketStore } from '@/stores/ticketStore'
 
-const items = ref([])
-const busy = ref(true)
-const error = ref('')
-const qr = ref('')
+const { state, counts, filteredItems, fetchMyTickets, openVoucher, closeVoucher, setTab } =
+  useTicketStore()
 
-async function load() {
-  busy.value = true
-  try {
-    items.value = await ticketService.getMyTickets()
-  } catch (e) {
-    error.value = e.message
-  } finally {
-    busy.value = false
-  }
-}
+const tabs = [
+  { key: 'todas', label: 'Todas' },
+  { key: 'validas', label: 'Válidas' },
+  { key: 'utilizadas', label: 'Utilizadas' },
+  { key: 'canceladas', label: 'Canceladas' }
+]
 
-async function showQR(ticket) {
-  error.value = ''
-  try {
-    qr.value = await QRCode.toDataURL(ticket.ticketId, { width: 260, margin: 2 })
-  } catch {
-    error.value = 'No se pudo generar el QR.'
-  }
-}
-
-onMounted(load)
+onMounted(() => {
+  fetchMyTickets()
+})
 </script>
 
 <template>
   <q-page class="container">
-    <div class="eyebrow">TU CUENTA</div>
-    <h1 class="page-heading">Mis entradas</h1>
-    <p>Tus vouchers y el estado de cada entrada.</p>
-
-    <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
-    <div v-if="busy" class="empty"><q-spinner /> Cargando…</div>
-    <div v-else-if="!items.length && !error" class="empty">
-      Todavía no tienes entradas registradas.
-    </div>
-
-    <div class="personal-list">
-      <article v-for="item in items" :key="item.ticketId" class="surface">
-        <q-badge :color="item.status === 'Válida' ? 'primary' : 'grey'">{{ item.status }}</q-badge>
-        <h3>{{ item.event }}</h3>
-        <p>{{ date(item.startDate) }} · {{ item.city }}</p>
-        <p>{{ item.venue }} · {{ item.address }}</p>
-        <p>Titular: {{ item.holder }} · {{ money(item.price, item.currency) }}</p>
-        <small>Referencia: {{ item.shortCode }}</small>
-        <p v-if="item.refundStatus === 'Pendiente'">
-          Pendiente de reembolso · {{ item.cancellationReason }}
+    <div class="tickets-topbar">
+      <div>
+        <div class="eyebrow">TU CUENTA</div>
+        <h1 class="page-heading tickets-topbar__title">Mis entradas</h1>
+        <p class="muted tickets-topbar__sub">
+          {{ counts.todas }} {{ counts.todas === 1 ? 'entrada' : 'entradas' }} en total
         </p>
-        <q-btn
-            no-caps
-            outline
-            color="primary"
-            label="Mostrar QR"
-            :disable="(item.status !== 'Valida' && item.status !== 'Válida') || item.eventStatus === 'Cancelado'"
-            @click="showQR(item)"
-          />
-        <router-link :to="'/evento/' + item.eventId">Ver evento</router-link>
-      </article>
+      </div>
+
+      <q-btn
+        unelevated
+        no-caps
+        color="primary"
+        icon="confirmation_number"
+        label="Comprar más"
+        class="tickets-topbar__cta"
+        to="/explorar"
+      />
     </div>
 
-    <TicketQrModal :qr="qr" @close="qr = ''" />
+    <div class="tickets-filter-bar" role="tablist" aria-label="Filtrar entradas por estado">
+      <div
+        v-for="tab in tabs"
+        :key="tab.key"
+        role="tab"
+        tabindex="0"
+        :aria-selected="state.activeTab === tab.key"
+        class="tickets-pill"
+        :class="{ 'tickets-pill--active': state.activeTab === tab.key }"
+        @click="setTab(tab.key)"
+        @keydown.enter.prevent="setTab(tab.key)"
+      >
+        {{ tab.label }} ({{ counts[tab.key] }})
+      </div>
+    </div>
+
+    <q-banner v-if="state.error" class="error" role="alert">{{ state.error }}</q-banner>
+
+    <div v-if="state.busy" class="empty">
+      <q-spinner color="primary" size="28px" />
+      <p>Cargando tus entradas…</p>
+    </div>
+
+    <div v-else-if="!filteredItems.length && !state.error" class="empty">
+      <h3>No tienes entradas en esta categoría</h3>
+      <p>Explora los próximos eventos publicados y asegura tu lugar.</p>
+      <q-btn unelevated no-caps color="primary" label="Explorar eventos" to="/explorar" />
+    </div>
+
+    <div v-else class="tickets-list">
+      <div v-for="item in filteredItems" :key="item.entradaId" class="tickets-list__item">
+        <TicketCard
+          :ticket="item"
+          :loading="state.loadingVoucherId === item.entradaId"
+          @select="openVoucher"
+        />
+      </div>
+    </div>
+
+    <TicketQrModal :ticket="state.selectedVoucher" @close="closeVoucher" />
   </q-page>
 </template>
+
+<style scoped>
+.tickets-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.tickets-topbar__title {
+  margin-bottom: 6px;
+}
+
+.tickets-topbar__sub {
+  margin: 0;
+  font-size: 14px;
+}
+
+.tickets-topbar__cta {
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.tickets-filter-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  background: var(--wash);
+  border: 1px solid var(--line);
+  padding: 6px;
+  border-radius: 999px;
+  margin-bottom: 28px;
+}
+
+.tickets-pill {
+  color: var(--muted-ink);
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tickets-pill:hover {
+  color: var(--ink);
+}
+
+.tickets-pill--active {
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: 0 2px 10px #231b3c18;
+}
+
+.tickets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tickets-list__item {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .tickets-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>

@@ -1,4 +1,4 @@
-import { get, post } from './httpClient'
+import { api, get, post, put } from './httpClient'
 
 export const eventService = {
   getCategories() {
@@ -29,5 +29,23 @@ export const eventService = {
   },
   getRecommendations(limit = 20) {
     return get(`/recommendations?limit=${limit}`)
+  },
+  getMyEvents() {
+    return get('/eventos/mis-eventos')
+  },
+  getMyEventDetail(id) {
+    return get(`/eventos/mis-eventos/${id}`)
+  },
+  createEvent(payload) {
+    return post('/eventos', payload)
+  },
+  updateEvent(id, payload) {
+    return put(`/eventos/${id}`, { ...payload, eventoId: Number(id) })
+  },
+  cancelEvent(id, payload) {
+    return api(`/eventos/${id}/cancel`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    })
   }
 }

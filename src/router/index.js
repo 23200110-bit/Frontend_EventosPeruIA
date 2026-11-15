@@ -76,6 +76,25 @@ const router = createRouter({
           name: 'organizer-checkin',
           component: () => import('@/pages/organizer/CheckIn.vue'),
           meta: { auth: true }
+        },
+        //HU-08: Mis eventos y Crear/Editar evento ANYELO
+        {
+          path: 'organizador/mis-eventos',
+          name: 'organizer-events',
+          component: () => import('@/pages/organizer/MyEvents.vue'),
+          meta: { auth: true }
+        },
+        {
+          path: 'organizador/crear-evento',
+          name: 'organizer-create-event',
+          component: () => import('@/pages/organizer/CreateEvent.vue'),
+          meta: { auth: true }
+        },
+        {
+          path: 'organizador/editar-evento/:id',
+          name: 'organizer-edit-event',
+          component: () => import('@/pages/organizer/CreateEvent.vue'),
+          meta: { auth: true }
         }
       ]
     },

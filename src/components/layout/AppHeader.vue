@@ -1,8 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { session, signOut } from '@/stores/authStore'
 
+const route = useRoute()
 const router = useRouter()
 const menu = ref(false)
 
@@ -22,37 +23,91 @@ function logout() {
 
       <q-space />
 
+      <!-- NAVEGACIÓN DE ESCRITORIO -->
       <nav class="desktop-nav" aria-label="Navegación principal">
-        <router-link to="/explorar">Explorar eventos</router-link>
-        <router-link to="/asistente"><q-icon name="auto_awesome" /> Asistente IA</router-link>
-        <router-link v-if="session.user" to="/recomendaciones">Para ti</router-link>
-        <router-link v-if="session.user" to="/entradas">Mis entradas</router-link>
-        <!-- SANTIAGO CHECK-IN -->
-        <router-link v-if="session.user" to="/organizador/asistentes">Check-in Puerta</router-link>
-        <!-- ---------------- -->
-        <router-link v-if="session.user" to="/avisos">Avisos</router-link>
+        <router-link to="/" exact-active-class="nav-pill-active">Inicio</router-link>
+        <router-link to="/explorar" active-class="nav-pill-active">Explorar</router-link>
+
+        <template v-if="session.user">
+          <router-link to="/asistente" active-class="nav-pill-active">
+            <q-icon name="auto_awesome" /> Asistente IA
+          </router-link>
+          <router-link to="/recomendaciones" active-class="nav-pill-active">Para ti</router-link>
+          <router-link to="/entradas" active-class="nav-pill-active">Mis entradas</router-link>
+          <!-- ANYELO MIS EVENTOS (HU-08) -->
+          <router-link
+            to="/organizador/mis-eventos"
+            :class="{
+              'nav-pill-active':
+                route.path.startsWith('/organizador/mis-eventos') ||
+                route.path.startsWith('/organizador/crear-evento') ||
+                route.path.startsWith('/organizador/editar-evento')
+            }"
+          >
+            Mis eventos
+          </router-link>
+          <!-- ---------------- -->
+          <!-- SANTIAGO CHECK-IN -->
+          <router-link to="/organizador/asistentes" active-class="nav-pill-active">Check-in Puerta</router-link>
+          <!-- ---------------- -->
+          <router-link to="/avisos" active-class="nav-pill-active">Avisos</router-link>
+        </template>
+
+        <template v-else>
+          <router-link to="/login" active-class="nav-pill-active">Iniciar sesión</router-link>
+          <router-link to="/registro" active-class="nav-pill-active">Crear cuenta</router-link>
+        </template>
       </nav>
 
-      <q-btn v-if="!session.user" flat no-caps label="Iniciar sesión" to="/login" class="desktop-nav" />
-      <q-btn v-if="!session.user" unelevated color="primary" no-caps label="Crear cuenta" to="/registro" />
-      <q-btn v-if="session.user" flat no-caps :label="session.user.firstName" to="/perfil" />
-      <q-btn v-if="session.user" flat no-caps label="Salir" @click="logout" />
+      <!-- ACCIONES DE CUENTA CON SESIÓN -->
+      <template v-if="session.user">
+        <q-btn
+          flat
+          no-caps
+          :label="session.user.firstName"
+          to="/perfil"
+          :class="{ 'nav-pill-active': route.path === '/perfil' }"
+        />
+        <q-btn flat no-caps label="Salir" @click="logout" />
+      </template>
+
       <q-btn flat label="☰" aria-label="Abrir menú" class="mobile-menu" @click="menu = !menu" />
     </q-toolbar>
 
+    <!-- NAVEGACIÓN MÓVIL -->
     <nav v-if="menu" class="mobile-links" aria-label="Navegación móvil">
-      <router-link to="/explorar" @click="menu = false">Explorar</router-link>
-      <router-link to="/asistente" @click="menu = false">Asistente IA</router-link>
+      <router-link to="/" exact-active-class="nav-pill-active" @click="menu = false">Inicio</router-link>
+      <router-link to="/explorar" active-class="nav-pill-active" @click="menu = false">Explorar</router-link>
+
       <template v-if="session.user">
-        <router-link to="/recomendaciones" @click="menu = false">Para ti</router-link>
-        <router-link to="/perfil" @click="menu = false">Perfil</router-link>
-        <router-link to="/entradas" @click="menu = false">Mis entradas</router-link>
-        <!-- SANTIAGO CHECK-IN -->
-        <router-link to="/organizador/asistentes" @click="menu = false">Check-in Puerta</router-link>
+        <router-link to="/asistente" active-class="nav-pill-active" @click="menu = false">Asistente IA</router-link>
+        <router-link to="/recomendaciones" active-class="nav-pill-active" @click="menu = false">Para ti</router-link>
+        <router-link to="/perfil" active-class="nav-pill-active" @click="menu = false">Perfil</router-link>
+        <router-link to="/entradas" active-class="nav-pill-active" @click="menu = false">Mis entradas</router-link>
+        <!-- ANYELO MIS EVENTOS (HU-08) -->
+        <router-link
+          to="/organizador/mis-eventos"
+          :class="{
+            'nav-pill-active':
+              route.path.startsWith('/organizador/mis-eventos') ||
+              route.path.startsWith('/organizador/crear-evento') ||
+              route.path.startsWith('/organizador/editar-evento')
+          }"
+          @click="menu = false"
+        >
+          Mis eventos
+        </router-link>
         <!-- ---------------- -->
-        <router-link to="/avisos" @click="menu = false">Avisos</router-link>
+        <!-- SANTIAGO CHECK-IN -->
+        <router-link to="/organizador/asistentes" active-class="nav-pill-active" @click="menu = false">Check-in Puerta</router-link>
+        <!-- ---------------- -->
+        <router-link to="/avisos" active-class="nav-pill-active" @click="menu = false">Avisos</router-link>
       </template>
-      <router-link v-else to="/login" @click="menu = false">Iniciar sesión</router-link>
+
+      <template v-else>
+        <router-link to="/login" active-class="nav-pill-active" @click="menu = false">Iniciar sesión</router-link>
+        <router-link to="/registro" active-class="nav-pill-active" @click="menu = false">Crear cuenta</router-link>
+      </template>
     </nav>
   </q-header>
 </template>

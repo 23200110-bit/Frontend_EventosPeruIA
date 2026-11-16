@@ -20,6 +20,8 @@ const statusMeta = computed(() => getTicketStatusMeta(props.ticket.estado))
 const isCanceled = computed(
   () => props.ticket.pendienteReembolso || statusMeta.value.key === 'anulada'
 )
+// [AGREGADO HU-13] Detecta si la entrada ya fue utilizada para habilitar la reseña
+const isUsed = computed(() => statusMeta.value.key === 'utilizada')
 </script>
 
 <template>
@@ -75,6 +77,21 @@ const isCanceled = computed(
 
         <div class="ticket-card__actions">
           <router-link :to="'/evento/' + ticket.eventoId">Ver evento</router-link>
+
+          <!-- [AGREGADO HU-13] Botón directo para reseñar cuando la entrada está Utilizada -->
+          <q-btn
+            v-if="isUsed"
+            unelevated
+            no-caps
+            icon="star_rate"
+            label="Reseñar evento"
+            class="ticket-card__review-btn"
+            :to="{
+              path: '/resenar/' + ticket.eventoId,
+              query: { ticketId: ticket.entradaId }
+            }"
+          />
+
           <q-btn
             unelevated
             no-caps
@@ -216,6 +233,7 @@ const isCanceled = computed(
   align-items: center;
   gap: 12px;
   padding-top: 4px;
+  flex-wrap: wrap;
 }
 
 .ticket-code {
@@ -232,14 +250,24 @@ const isCanceled = computed(
 .ticket-card__actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   font-size: 13px;
   font-weight: 700;
+  flex-wrap: wrap;
 }
 
 .ticket-card__btn {
   background: var(--wash);
   color: var(--brand);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-weight: 700;
+}
+
+/* [AGREGADO HU-13] Estilo del botón Reseñar evento */
+.ticket-card__review-btn {
+  background: #fff4d6;
+  color: #8a5a00;
   border-radius: 999px;
   padding: 6px 16px;
   font-weight: 700;

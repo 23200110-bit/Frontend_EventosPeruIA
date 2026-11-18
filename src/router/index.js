@@ -24,6 +24,19 @@ const router = createRouter({
           name: 'event-detail',
           component: () => import('@/pages/public/EventDetail.vue')
         },
+        // US-010: compra de entradas
+        {
+          path: 'evento/:id/comprar',
+          name: 'checkout',
+          component: () => import('@/pages/user/Checkout.vue'),
+          meta: { auth: true }
+        },
+        // US-018: recuperación de contraseña
+        {
+          path: 'recuperar-contrasena',
+          name: 'forgot-password',
+          component: () => import('@/pages/auth/ForgotPassword.vue')
+        },
         {
           path: 'login',
           name: 'login',

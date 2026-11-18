@@ -97,6 +97,13 @@ const router = createRouter({
           component: () => import('@/pages/organizer/MyEvents.vue'),
           meta: { auth: true }
         },
+        //RESEÑAR SANTIAGO
+        {
+          path: 'resenar/:eventoId',
+          name: 'review-event',
+          component: () => import('@/pages/user/ReviewEvent.vue'),
+          meta: { auth: true }
+        },
         {
           path: 'organizador/crear-evento',
           name: 'organizer-create-event',

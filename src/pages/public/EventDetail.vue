@@ -18,7 +18,7 @@ const busy = ref(true)
 const error = ref('')
 const reviewError = ref('')
 const reviewSuccess = ref('')
-const bookingNotice = ref('')
+
 let timer = null
 
 const review = reactive({
@@ -94,7 +94,7 @@ async function load() {
   error.value = ''
   reviewError.value = ''
   reviewSuccess.value = ''
-  bookingNotice.value = ''
+
   review.ticketId = ''
 
   try {
@@ -127,11 +127,10 @@ async function sendReview() {
 function handleBuyAction() {
   if (isSoldOut.value || isCancelled.value) return
   if (!session.user) {
-    router.push({ path: '/login', query: { next: route.fullPath } })
+    router.push({ path: '/login', query: { next: `/evento/${event.value.id}/comprar` } })
     return
   }
-  bookingNotice.value =
-    'Disponibilidad verificada. El flujo de checkout se conectará aquí cuando esté publicado.'
+  router.push(`/evento/${event.value.id}/comprar`)
 }
 
 // [AGREGADO HU-06] Recarga datos si el usuario hace clic en uno de los eventos sugeridos abajo
@@ -223,9 +222,7 @@ onBeforeUnmount(() => {
             @click="handleBuyAction"
           />
 
-          <q-banner v-if="bookingNotice" class="success" style="margin-top: 10px;" role="status">
-            {{ bookingNotice }}
-          </q-banner>
+          
         </aside>
       </div>
 

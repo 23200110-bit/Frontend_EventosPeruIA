@@ -103,6 +103,17 @@ onBeforeUnmount(() => {
             :value="Math.max(0, Math.min(1, event.availableSpots / event.capacity))"
             color="primary"
           />
+          <!-- US-010 -->
+          <q-btn
+            v-if="event.status === 'Publicado' && event.availableSpots > 0"
+            unelevated
+            no-caps
+            color="primary"
+            class="full-width"
+            label="Comprar entradas"
+            :to="'/evento/' + event.id + '/comprar'"
+          />
+          <p v-if="event.status === 'Cancelado'" class="muted">Este evento fue cancelado.</p>
           <p class="muted">Cupos sujetos a disponibilidad.</p>
         </aside>
       </div>

@@ -18,6 +18,17 @@ const busy = ref(false)
 const error = ref('')
 const message = ref('')
 
+// US-001: el botón de registro solo se habilita cuando los campos obligatorios son válidos.
+const registerValid = computed(
+  () =>
+    required(firstName.value) === true &&
+    required(lastName.value) === true &&
+    required(email.value) === true &&
+    emailRule(email.value) === true &&
+    password.value.length >= 8 &&
+    confirmPassword.value === password.value
+)
+
 const nextQuery = computed(() =>
   typeof route.query.next === 'string' ? { next: route.query.next } : {}
 )
@@ -41,7 +52,10 @@ async function submit() {
       message.value = 'Tu cuenta está lista. Inicia sesión para comenzar.'
     } else {
       signIn(await authService.login(credentials))
-      await router.push('/')
+      // Vuelve a la página que pidió iniciar sesión (por ejemplo, la compra). Solo rutas internas.
+      const next = route.query.next
+      const internal = typeof next === 'string' && next.startsWith('/') && !next.startsWith('//')
+      await router.push(internal ? next : '/')
     }
   } catch (failure) {
     error.value = failure.message
@@ -150,7 +164,12 @@ async function submit() {
           no-caps
           :label="register ? 'Crear cuenta' : 'Iniciar sesión'"
           :loading="busy"
+          :disable="register && !registerValid"
         />
+        <!-- US-018 -->
+        <p v-if="!register" class="auth-switch">
+          <router-link to="/recuperar-contrasena">Olvidé mi contraseña</router-link>
+        </p>
       </q-form>
 
       <p class="auth-switch">

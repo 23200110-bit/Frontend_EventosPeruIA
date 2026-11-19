@@ -8,33 +8,39 @@
   --panel-shadow: 0 1px 2px #231b3c0d, 0 10px 30px -12px #231b3c26;
 }
 
-/* ---- Cabecera oscura con degradado ---- */
+/* ---- Fondo de pantalla: oscuro arriba, se aclara hacia abajo ---- */
+body.panel-bg {
+  background: linear-gradient(180deg, #120a2b 0, #24155a 220px, #3b2a94 320px, #faf8ff 640px) no-repeat,
+    #faf8ff;
+}
+body.panel-bg .q-layout,
+body.panel-bg .q-page-container,
+body.panel-bg .q-page.panel-page {
+  background: transparent;
+}
+
+/* ---- Cabecera sobre el fondo oscuro ---- */
 .panel-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 28px;
-  padding: 44px 44px 40px;
-  margin-bottom: 28px;
+  padding: 8px 0 30px;
   color: #fff;
-  background:
-    radial-gradient(900px 340px at 85% -10%, #6a4fe0aa, transparent 60%),
-    linear-gradient(165deg, #120a2b 0%, #24155a 55%, #3b2a94 100%);
 }
 .panel-hero::after {
   content: '✳';
   position: absolute;
-  right: 36px;
-  bottom: -46px;
-  font-size: 220px;
+  right: 10px;
+  top: -30px;
+  font-size: 150px;
   line-height: 1;
   color: var(--gold);
-  opacity: 0.14;
+  opacity: 0.16;
   transform: rotate(12deg);
   pointer-events: none;
 }
 .panel-hero .eyebrow {
   display: inline-block;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   padding: 6px 14px;
   border-radius: 999px;
   background: #ffffff1a;
@@ -45,11 +51,10 @@
   font-family: var(--panel-display);
   font-weight: 800;
   text-transform: uppercase;
-  font-size: clamp(44px, 7vw, 84px);
-  line-height: 0.92;
-  letter-spacing: 0;
-  margin: 0 0 18px;
-  max-width: 14ch;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  margin: 0 0 10px;
 }
 .panel-hero p {
   position: relative;
@@ -57,7 +62,7 @@
   max-width: 62ch;
   margin: 0;
   color: #e6defa;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 /* ---- Superficies, botones y campos redondeados ---- */
@@ -94,7 +99,7 @@
   min-height: 44px;
   padding: 0 20px;
   margin-right: 8px;
-  background: #ece6fa;
+  background: #fff;
   color: var(--brand);
   font-weight: 700;
 }
@@ -211,6 +216,3 @@
   border-radius: 999px;
 }
 
-@media (max-width: 640px) {
-  .panel-hero { padding: 30px 24px; border-radius: 22px; }
-}

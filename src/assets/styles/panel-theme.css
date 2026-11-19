@@ -1,9 +1,10 @@
 /* Tema de paneles (Admin US-016 y Asistentes US-019).
    Todo va bajo .panel-page para no afectar al resto de pantallas. */
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Fjalla+One&display=swap');
 
 .panel-page {
   --panel-display: 'Lilita One', 'Arial Rounded MT Bold', 'Arial Black', Impact, sans-serif;
+  --panel-text: 'Fjalla One', 'Arial Narrow', Impact, sans-serif;
   --panel-radius: 22px;
   --panel-shadow: 0 1px 2px #231b3c0d, 0 10px 30px -12px #231b3c26;
 }
@@ -54,11 +55,8 @@ body.panel-bg .q-page.panel-page {
   font-size: clamp(32px, 4.4vw, 50px);
   line-height: 1;
   letter-spacing: 0.05em;
-  color: #000;
-  /* Contorno blanco para que el negro se lea sobre el fondo azul */
-  -webkit-text-stroke: 4px #fff;
-  paint-order: stroke fill;
-  text-shadow: 0 4px 0 #0a1f6b99;
+  color: #fff;
+  text-shadow: 0 3px 0 #0a1f6b66;
   margin: 0 0 10px;
 }
 .panel-hero p {
@@ -66,8 +64,11 @@ body.panel-bg .q-page.panel-page {
   z-index: 1;
   max-width: 62ch;
   margin: 0;
-  color: #e6defa;
-  line-height: 1.65;
+  color: #dbe7ff;
+  font-family: var(--panel-text);
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
 }
 
 /* ---- Superficies, botones y campos redondeados ---- */

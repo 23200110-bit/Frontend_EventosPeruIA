@@ -117,11 +117,14 @@ function goToCheckIn() {
 let searchTimer
 let pollTimer
 
-watch(selectedId, () => {
+watch(selectedId, (newId) => {
   search.value = ''
   status.value = ''
   summary.value = null
   rows.value = []
+  if (newId && Number(route.query.evento) !== Number(newId)) {
+    router.replace({ query: { ...route.query, evento: newId } })
+  }
   loadAttendees(1)
 })
 watch(search, () => {
@@ -227,7 +230,13 @@ const checkinPercent = computed(() => {
             <span>Avance de check-in</span>
             <span>{{ checkinPercent }}%</span>
           </div>
-          <q-linear-progress :value="checkinPercent / 100" size="12px" color="deep-purple-6" track-color="deep-purple-1" rounded />
+          <q-linear-progress
+            :value="checkinPercent / 100"
+            size="12px"
+            color="deep-purple-6"
+            track-color="deep-purple-1"
+            rounded
+          />
         </div>
 
         <div class="attendee-filters">

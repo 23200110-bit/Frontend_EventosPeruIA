@@ -104,6 +104,13 @@ const router = createRouter({
           component: () => import('@/pages/user/ReviewEvent.vue'),
           meta: { auth: true }
         },
+        // US-016: panel administrativo (solo administradores)
+        {
+          path: 'admin',
+          name: 'admin',
+          component: () => import('@/pages/admin/AdminPanel.vue'),
+          meta: { auth: true, admin: true }
+        },
         {
           path: 'organizador/crear-evento',
           name: 'organizer-create-event',

@@ -51,6 +51,7 @@ function logout() {
           <router-link to="/organizador/asistentes" active-class="nav-pill-active">Check-in Puerta</router-link>
           <!-- ---------------- -->
           <router-link to="/avisos" active-class="nav-pill-active">Avisos</router-link>
+          <router-link v-if="session.user.isAdministrator" to="/admin" active-class="nav-pill-active">Admin</router-link>
         </template>
 
         <template v-else>
@@ -102,6 +103,7 @@ function logout() {
         <router-link to="/organizador/asistentes" active-class="nav-pill-active" @click="menu = false">Check-in Puerta</router-link>
         <!-- ---------------- -->
         <router-link to="/avisos" active-class="nav-pill-active" @click="menu = false">Avisos</router-link>
+        <router-link v-if="session.user.isAdministrator" to="/admin" active-class="nav-pill-active" @click="menu = false">Panel admin</router-link>
       </template>
 
       <template v-else>

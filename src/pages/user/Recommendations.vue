@@ -6,10 +6,13 @@ import { date, money } from '@/utils/formatters'
 const items = ref([])
 const busy = ref(true)
 const error = ref('')
+const failedImages = ref({})
 
 async function load() {
   busy.value = true
   error.value = ''
+  failedImages.value = {}
+
   try {
     items.value = await eventService.getRecommendations(20)
   } catch (e) {
@@ -44,9 +47,18 @@ onMounted(load)
         class="event-card"
       >
         <div class="event-cover" :class="'cover-' + (index % 4)">
+          <img
+            v-if="item.imageUrl && failedImages[item.eventId] !== item.imageUrl"
+            :key="item.imageUrl"
+            :src="item.imageUrl"
+            alt=""
+            loading="lazy"
+            @error="failedImages[item.eventId] = item.imageUrl"
+          />
+          <strong v-else aria-hidden="true">✳</strong>
           <span>{{ item.category }}</span>
-          <strong>✳</strong>
         </div>
+
         <div class="event-info">
           <small>{{ date(item.startDate) }}</small>
           <h3>{{ item.name }}</h3>
@@ -58,3 +70,13 @@ onMounted(load)
     </div>
   </q-page>
 </template>
+
+<style scoped>
+.event-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+</style>

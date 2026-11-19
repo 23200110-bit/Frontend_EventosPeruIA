@@ -212,7 +212,7 @@ onMounted(init)
       <q-btn
         flat
         no-caps
-        color="primary"
+        color="white"
         icon="arrow_back"
         label="Volver a Mis eventos"
         @click="router.push('/organizador/mis-eventos')"

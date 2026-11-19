@@ -1,4 +1,5 @@
 <script setup>
+import '@/assets/styles/panel-theme.css'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { eventService } from '@/services/eventService'
@@ -140,16 +141,24 @@ onBeforeUnmount(() => {
   clearTimeout(searchTimer)
   clearInterval(pollTimer)
 })
+
+const checkinPercent = computed(() => {
+  const total = summary.value?.entradasVendidas || 0
+  if (!total) return 0
+  return Math.round(((summary.value.checkInsRealizados || 0) / total) * 100)
+})
 </script>
 
 <template>
-  <q-page class="container">
-    <div class="eyebrow">PANEL DE ORGANIZADOR · US-019</div>
-    <h1 class="page-heading">Gestión de asistentes</h1>
-    <p class="detail-description" style="margin-top: 0">
-      Elige uno de tus eventos para ver las entradas vendidas, quiénes ya ingresaron y buscar una
-      entrada por su código.
-    </p>
+  <q-page class="container panel-page">
+    <header class="panel-hero">
+      <div class="eyebrow">PANEL DE ORGANIZADOR · US-019</div>
+      <h1 class="panel-title">Gestión de asistentes</h1>
+      <p>
+        Elige uno de tus eventos para ver las entradas vendidas, quiénes ya ingresaron y buscar una
+        entrada por su código.
+      </p>
+    </header>
 
     <q-banner v-if="eventsError" class="error" role="alert">{{ eventsError }}</q-banner>
     <div v-if="loadingEvents" class="empty"><q-spinner /> Cargando tus eventos…</div>
@@ -185,27 +194,40 @@ onBeforeUnmount(() => {
       <template v-else>
         <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
 
-        <div v-if="summary" class="attendee-stats">
-          <div class="surface stat">
-            <span class="muted">Entradas vendidas</span>
+        <div v-if="summary" class="stat-grid">
+          <div class="stat-card tone-brand">
+            <span class="stat-icon"><q-icon name="confirmation_number" /></span>
             <strong>{{ summary.entradasVendidas }}</strong>
+            <span class="muted">Entradas vendidas</span>
           </div>
-          <div class="surface stat">
-            <span class="muted">Check-in realizados</span>
+          <div class="stat-card tone-green">
+            <span class="stat-icon"><q-icon name="how_to_reg" /></span>
             <strong>{{ summary.checkInsRealizados }}</strong>
+            <span class="muted">Check-in realizados</span>
           </div>
-          <div class="surface stat">
-            <span class="muted">Válidas</span>
+          <div class="stat-card tone-gold">
+            <span class="stat-icon"><q-icon name="verified" /></span>
             <strong>{{ summary.validas }}</strong>
+            <span class="muted">Válidas</span>
           </div>
-          <div class="surface stat">
-            <span class="muted">Utilizadas</span>
+          <div class="stat-card tone-slate">
+            <span class="stat-icon"><q-icon name="task_alt" /></span>
             <strong>{{ summary.utilizadas }}</strong>
+            <span class="muted">Utilizadas</span>
           </div>
-          <div class="surface stat">
-            <span class="muted">Anuladas</span>
+          <div class="stat-card tone-red">
+            <span class="stat-icon"><q-icon name="block" /></span>
             <strong>{{ summary.anuladas }}</strong>
+            <span class="muted">Anuladas</span>
           </div>
+        </div>
+
+        <div v-if="summary && summary.entradasVendidas > 0" class="surface checkin-progress">
+          <div class="row">
+            <span>Avance de check-in</span>
+            <span>{{ checkinPercent }}%</span>
+          </div>
+          <q-linear-progress :value="checkinPercent / 100" size="12px" color="deep-purple-6" track-color="deep-purple-1" rounded />
         </div>
 
         <div class="attendee-filters">
@@ -268,23 +290,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.attendee-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 14px;
-  margin: 0 0 8px;
-}
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 18px;
-  margin: 0;
-}
-.stat strong {
-  font-size: 28px;
-  line-height: 1;
-}
 .attendee-filters {
   display: flex;
   gap: 12px;

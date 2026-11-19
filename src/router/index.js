@@ -14,11 +14,8 @@ const router = createRouter({
           name: 'home',
           component: () => import('@/pages/public/Explore.vue')
         },
-        {
-          path: 'explorar',
-          name: 'explore',
-          component: () => import('@/pages/public/Explore.vue')
-        },
+        // Inicio y Explorar eran la misma pantalla: se conserva solo "/"
+        { path: 'explorar', redirect: '/' },
         {
           path: 'evento/:id',
           name: 'event-detail',
@@ -69,7 +66,7 @@ const router = createRouter({
           path: 'entradas',
           name: 'tickets',
           component: () => import('@/pages/user/MyTickets.vue'),
-          meta: { auth: true }
+          meta: { auth: true, noAdmin: true }
         },
         {
           path: 'avisos',
@@ -82,20 +79,20 @@ const router = createRouter({
           path: 'organizador/asistentes',
           name: 'organizer-attendees',
           component: () => import('@/pages/organizer/Attendees.vue'),
-          meta: { auth: true }
+          meta: { auth: true, noAdmin: true }
         },
         {
           path: 'organizador/checkin/:eventoId',
           name: 'organizer-checkin',
           component: () => import('@/pages/organizer/CheckIn.vue'),
-          meta: { auth: true }
+          meta: { auth: true, noAdmin: true }
         },
         //HU-08: Mis eventos y Crear/Editar evento ANYELO
         {
           path: 'organizador/mis-eventos',
           name: 'organizer-events',
           component: () => import('@/pages/organizer/MyEvents.vue'),
-          meta: { auth: true }
+          meta: { auth: true, noAdmin: true }
         },
         //RESEÑAR SANTIAGO
         {

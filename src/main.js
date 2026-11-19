@@ -5,6 +5,7 @@ import '@quasar/extras/material-icons/material-icons.css'
 import 'quasar/dist/quasar.css'
 import '@/assets/styles/style.css'
 import '@/assets/styles/experience.css'
+import '@/assets/styles/theme-blue.css'
 import App from './App.vue'
 import router from './router'
 

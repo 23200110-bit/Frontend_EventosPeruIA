@@ -1,0 +1,212 @@
+/* Tema de paneles (Admin US-016 y Asistentes US-019).
+   Todo va bajo .panel-page para no afectar al resto de pantallas. */
+
+.panel-page {
+  --panel-display: 'Lilita One', 'Arial Rounded MT Bold', 'Arial Black', Impact, sans-serif;
+  --panel-text: 'Fjalla One', 'Arial Narrow', Impact, sans-serif;
+  --panel-radius: 22px;
+  --panel-shadow: 0 1px 2px #231b3c0d, 0 10px 30px -12px #231b3c26;
+}
+
+/* ---- Cabecera sobre el fondo oscuro ---- */
+.panel-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 8px 0 30px;
+  color: #fff;
+}
+.panel-hero::after {
+  content: '✳';
+  position: absolute;
+  right: 10px;
+  top: -30px;
+  font-size: 150px;
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0.16;
+  transform: rotate(12deg);
+  pointer-events: none;
+}
+.panel-hero .eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #ffffff1a;
+  color: var(--gold);
+  font-size: 11px;
+}
+.panel-title {
+  font-family: var(--panel-display);
+  font-weight: 400; /* Lilita One solo tiene un peso */
+  text-transform: uppercase;
+  font-size: clamp(32px, 4.4vw, 50px);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: #fff;
+  text-shadow: 0 3px 0 #0a1f6b66;
+  margin: 0 0 10px;
+}
+.panel-hero p {
+  position: relative;
+  z-index: 1;
+  max-width: 62ch;
+  margin: 0;
+  color: #dbe7ff;
+  font-family: var(--panel-text);
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+}
+
+/* ---- Superficies, botones y campos redondeados ---- */
+.panel-page .surface {
+  border: 0;
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+}
+.panel-page .q-btn {
+  border-radius: 999px;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-weight: 700;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.panel-page .q-btn:not(.q-btn--flat):not(.q-btn--disable):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -8px #5038b988;
+}
+.panel-page .q-field--outlined .q-field__control {
+  border-radius: 16px;
+}
+.panel-page .error,
+.panel-page .success {
+  border-radius: 16px;
+}
+
+/* ---- Pestañas tipo píldora ---- */
+.panel-page .q-tabs {
+  margin-bottom: 14px;
+}
+.panel-page .q-tab {
+  border-radius: 999px;
+  min-height: 44px;
+  padding: 0 20px;
+  margin-right: 8px;
+  background: #fff;
+  color: var(--brand);
+  font-weight: 700;
+}
+.panel-page .q-tab--active,
+.panel-page .q-tab--active .q-tab__label,
+.panel-page .q-tab--active .q-icon {
+  background: var(--brand);
+  color: #fff !important;
+}
+.panel-page .q-tab--active .q-tab__label,
+.panel-page .q-tab--active .q-icon {
+  background: transparent;
+}
+.panel-page .q-tab__indicator {
+  display: none;
+}
+.panel-page .q-tabs .q-separator,
+.panel-page > .q-separator {
+  display: none;
+}
+
+/* ---- Tablas ---- */
+.panel-page .q-table__container {
+  border-radius: 18px;
+}
+.panel-page .q-table thead th {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-ink);
+  background: var(--wash);
+}
+.panel-page .q-table tbody tr {
+  transition: background 0.15s;
+}
+.panel-page .q-table tbody tr:hover {
+  background: #f7f3ff;
+}
+
+/* ---- Etiquetas de estado suaves ---- */
+.panel-page .q-badge {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.panel-page .q-badge.bg-positive { background: #dff5e7 !important; color: #14683a !important; }
+.panel-page .q-badge.bg-negative { background: #fde4e1 !important; color: #a5251a !important; }
+.panel-page .q-badge.bg-warning  { background: #fff0c9 !important; color: #8a5a00 !important; }
+.panel-page .q-badge.bg-orange   { background: #ffe6d2 !important; color: #a34a0c !important; }
+.panel-page .q-badge.bg-grey     { background: #ebe8f3 !important; color: #5a5470 !important; }
+.panel-page .q-badge.bg-primary  { background: #e6e0fb !important; color: #3d2a9c !important; }
+.panel-page .q-badge.bg-deep-purple { background: #e6e0fb !important; color: #3d2a9c !important; }
+
+/* ---- Tarjetas de estadística ---- */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin: 0 0 20px;
+}
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px;
+  margin: 0 !important;
+  border-radius: var(--panel-radius);
+  background: #fff;
+  box-shadow: var(--panel-shadow);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+.stat-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 10px;
+  border-radius: 14px;
+  font-size: 22px;
+}
+.stat-card strong {
+  font-family: var(--panel-display);
+  font-size: 46px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink);
+}
+.stat-card .muted {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.tone-brand .stat-icon { background: #e6e0fb; color: #4a33a8; }
+.tone-green .stat-icon { background: #dff5e7; color: #14683a; }
+.tone-gold .stat-icon { background: #fff0c9; color: #8a5a00; }
+.tone-slate .stat-icon { background: #ebe8f3; color: #5a5470; }
+.tone-red .stat-icon { background: #fde4e1; color: #a5251a; }
+
+.checkin-progress {
+  margin: 0 0 22px !important;
+  padding: 18px 22px;
+}
+.checkin-progress .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+.checkin-progress .q-linear-progress {
+  border-radius: 999px;
+}
+

@@ -1,0 +1,123 @@
+/* Tema azul global: fondo degradado, tipografías y bordes redondeados.
+   Se carga después de style.css y experience.css. */
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Fjalla+One&display=swap');
+
+:root {
+  --font-display: 'Lilita One', 'Arial Rounded MT Bold', 'Arial Black', Impact, sans-serif;
+  --font-lead: 'Fjalla One', 'Arial Narrow', Impact, sans-serif;
+  --blue-deep: #04122f;
+  --blue-mid: #0a2a78;
+  --blue-bright: #1f5fe0;
+  --blue-wash: #f3f7ff;
+  --radius-lg: 22px;
+  --shadow-soft: 0 1px 2px #231b3c0d, 0 10px 30px -12px #231b3c26;
+}
+
+/* ---- Fondo de pantalla: azul oscuro arriba, se aclara hacia abajo ---- */
+body {
+  background:
+    linear-gradient(180deg, var(--blue-deep) 0, var(--blue-mid) 220px, var(--blue-bright) 330px, var(--blue-wash) 660px) no-repeat,
+    var(--blue-wash);
+}
+.q-layout,
+.q-page-container,
+.q-page {
+  background: transparent;
+}
+
+/* ---- Cabeceras de pantalla (eyebrow + título + descripción) ---- */
+.eyebrow:has(+ .page-heading),
+.assistant-header .eyebrow {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #ffffff1a;
+  color: var(--gold);
+  font-size: 11px;
+}
+.page-heading,
+.assistant-header h1,
+.hero h1,
+.auth-aside h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 3px 0 #0a1f6b66;
+}
+.page-heading,
+.assistant-header h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.05;
+}
+.hero h1,
+.auth-aside h1 {
+  line-height: 1.02;
+}
+.page-heading + p,
+.page-heading + .muted,
+.assistant-header p,
+.hero p,
+.auth-aside p {
+  font-family: var(--font-lead);
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: #dbe7ff;
+}
+.page-heading ~ .detail-description {
+  color: #e8f0ff;
+}
+.hero h1 em,
+.auth-aside h1 em {
+  color: var(--gold);
+}
+.q-page.container > .back-link {
+  color: #cfe0ff;
+}
+
+/* El hero de Explorar deja ver el degradado de fondo */
+.hero {
+  background: transparent;
+}
+.auth-aside {
+  background: linear-gradient(165deg, var(--blue-deep) 0%, var(--blue-mid) 55%, var(--blue-bright) 130%);
+}
+
+/* El botón del asistente sobre fondo oscuro */
+.assistant-header > .q-btn {
+  background: #fff;
+}
+
+/* ---- Superficies, botones y campos redondeados ---- */
+.surface,
+.event-card,
+.search-panel,
+.empty {
+  border-radius: var(--radius-lg);
+}
+.surface,
+.event-card {
+  border-color: transparent;
+  box-shadow: var(--shadow-soft);
+}
+.event-card:hover {
+  box-shadow: 0 16px 34px -14px #0a2a7855;
+}
+.q-page .q-btn:not(.q-btn--round) {
+  border-radius: 999px;
+  font-weight: 700;
+}
+.q-field--outlined .q-field__control {
+  border-radius: 16px;
+}
+.q-banner.error,
+.q-banner.success {
+  border-radius: 16px;
+}
+
+/* Login y recuperar contraseña: el lado del formulario sigue siendo blanco */
+.q-page.auth-page {
+  background: #fff;
+}

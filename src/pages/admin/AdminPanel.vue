@@ -1,14 +1,11 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import '@/assets/styles/panel-theme.css'
 import { eventService } from '@/services/eventService'
 import { session } from '@/stores/authStore'
 import AdminUsersTable from '@/components/admin/AdminUsersTable.vue'
 import AdminEventsTable from '@/components/admin/AdminEventsTable.vue'
 import ModerationDialog from '@/components/admin/ModerationDialog.vue'
-
-onMounted(() => document.body.classList.add('panel-bg'))
-onBeforeUnmount(() => document.body.classList.remove('panel-bg'))
 
 const isAdmin = computed(() => session.user?.isAdministrator === true)
 

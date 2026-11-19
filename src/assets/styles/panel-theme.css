@@ -1,23 +1,11 @@
 /* Tema de paneles (Admin US-016 y Asistentes US-019).
    Todo va bajo .panel-page para no afectar al resto de pantallas. */
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Fjalla+One&display=swap');
 
 .panel-page {
   --panel-display: 'Lilita One', 'Arial Rounded MT Bold', 'Arial Black', Impact, sans-serif;
   --panel-text: 'Fjalla One', 'Arial Narrow', Impact, sans-serif;
   --panel-radius: 22px;
   --panel-shadow: 0 1px 2px #231b3c0d, 0 10px 30px -12px #231b3c26;
-}
-
-/* ---- Fondo de pantalla: oscuro arriba, se aclara hacia abajo ---- */
-body.panel-bg {
-  background: linear-gradient(180deg, #04122f 0, #0a2a78 220px, #1f5fe0 330px, #f3f7ff 660px) no-repeat,
-    #f3f7ff;
-}
-body.panel-bg .q-layout,
-body.panel-bg .q-page-container,
-body.panel-bg .q-page.panel-page {
-  background: transparent;
 }
 
 /* ---- Cabecera sobre el fondo oscuro ---- */

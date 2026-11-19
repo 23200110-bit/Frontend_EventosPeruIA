@@ -14,9 +14,6 @@ const loadingEvents = ref(true)
 const eventsError = ref('')
 
 const summary = ref(null)
-
-onMounted(() => document.body.classList.add('panel-bg'))
-onBeforeUnmount(() => document.body.classList.remove('panel-bg'))
 const rows = ref([])
 const loading = ref(false)
 const error = ref('')

@@ -53,8 +53,12 @@ body.panel-bg .q-page.panel-page {
   text-transform: uppercase;
   font-size: clamp(32px, 4.4vw, 50px);
   line-height: 1;
-  letter-spacing: 0.02em;
-  text-shadow: 0 3px 0 #0a1f6b66;
+  letter-spacing: 0.05em;
+  color: #000;
+  /* Contorno blanco para que el negro se lea sobre el fondo azul */
+  -webkit-text-stroke: 4px #fff;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 #0a1f6b99;
   margin: 0 0 10px;
 }
 .panel-hero p {

@@ -47,5 +47,37 @@ export const eventService = {
       method: 'PATCH',
       body: JSON.stringify(payload)
     })
+  },
+  // US-019: asistentes de un evento propio
+  getEventAttendees(id, { buscar = '', estado = '', pagina = 1, tamanoPagina = 20 } = {}) {
+    const params = new URLSearchParams({ pagina, tamanoPagina })
+    if (buscar) params.set('buscar', buscar)
+    if (estado) params.set('estado', estado)
+    return get(`/events/${id}/asistentes?${params}`)
+  },
+  // US-016: moderación administrativa
+  adminGetUsers({ buscar = '', estado = '', pagina = 1, tamanoPagina = 10 } = {}) {
+    const params = new URLSearchParams({ pagina, tamanoPagina })
+    if (buscar) params.set('buscar', buscar)
+    if (estado) params.set('estado', estado)
+    return get(`/admin/usuarios?${params}`)
+  },
+  adminToggleUser(id, { estado, motivo }) {
+    return api(`/admin/usuarios/${id}/estado`, {
+      method: 'PATCH',
+      body: JSON.stringify({ estado, motivo, confirmado: true })
+    })
+  },
+  adminGetEvents({ buscar = '', estado = '', pagina = 1, tamanoPagina = 10 } = {}) {
+    const params = new URLSearchParams({ pagina, tamanoPagina })
+    if (buscar) params.set('buscar', buscar)
+    if (estado) params.set('estado', estado)
+    return get(`/admin/eventos?${params}`)
+  },
+  adminModerateEvent(id, { accion, motivo }) {
+    return api(`/admin/eventos/${id}/moderar`, {
+      method: 'PATCH',
+      body: JSON.stringify({ accion, motivo, confirmado: true })
+    })
   }
 }

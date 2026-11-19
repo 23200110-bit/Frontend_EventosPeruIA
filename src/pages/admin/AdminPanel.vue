@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import '@/assets/styles/panel-theme.css'
 import { eventService } from '@/services/eventService'
 import { session } from '@/stores/authStore'
 import AdminUsersTable from '@/components/admin/AdminUsersTable.vue'
@@ -94,20 +95,21 @@ async function confirm(motivo) {
 </script>
 
 <template>
-  <q-page class="container">
-    <div class="eyebrow">PANEL ADMINISTRATIVO · US-016</div>
-    <h1 class="page-heading">Moderación de la plataforma</h1>
+  <q-page class="container panel-page">
+    <header class="panel-hero">
+      <div class="eyebrow">PANEL ADMINISTRATIVO · US-016</div>
+      <h1 class="panel-title">Moderación de la plataforma</h1>
+      <p v-if="isAdmin">
+        Busca usuarios y eventos, bloquea o reactiva cuentas y retira o suspende eventos que
+        incumplan las reglas. Cada acción pide confirmación y queda registrada para auditoría.
+      </p>
+    </header>
 
     <q-banner v-if="!isAdmin" class="error" role="alert">
       Solo los administradores pueden acceder a este panel.
     </q-banner>
 
     <template v-else>
-      <p class="detail-description" style="margin-top: 0">
-        Busca usuarios y eventos, bloquea o reactiva cuentas y retira o suspende eventos que
-        incumplan las reglas. Cada acción pide confirmación y queda registrada para auditoría.
-      </p>
-
       <q-banner v-if="success" class="success" role="status">{{ success }}</q-banner>
       <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
 

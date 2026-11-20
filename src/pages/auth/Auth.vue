@@ -1,9 +1,10 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { authService } from '@/services/authService'
 import { signIn } from '@/stores/authStore'
 import { required, emailRule } from '@/utils/validators'
+import { googleClientId, renderGoogleButton } from '@/utils/googleSignIn'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,6 +18,7 @@ const showPassword = ref(false)
 const busy = ref(false)
 const error = ref('')
 const message = ref('')
+const googleButton = ref(null)
 
 // US-001: el botón de registro solo se habilita cuando los campos obligatorios son válidos.
 const registerValid = computed(
@@ -32,6 +34,33 @@ const registerValid = computed(
 const nextQuery = computed(() =>
   typeof route.query.next === 'string' ? { next: route.query.next } : {}
 )
+
+// Vuelve a la página que pidió iniciar sesión (por ejemplo, la compra). Solo rutas internas.
+async function goAfterLogin() {
+  const next = route.query.next
+  const internal = typeof next === 'string' && next.startsWith('/') && !next.startsWith('//')
+  await router.push(internal ? next : '/')
+}
+
+async function loginWithGoogle(idToken) {
+  if (busy.value) return
+  busy.value = true
+  error.value = ''
+  try {
+    signIn(await authService.googleLogin(idToken))
+    await goAfterLogin()
+  } catch (failure) {
+    error.value = failure.message
+  } finally {
+    busy.value = false
+  }
+}
+
+onMounted(() => {
+  renderGoogleButton(googleButton.value, loginWithGoogle).catch((failure) => {
+    error.value = failure.message
+  })
+})
 
 async function submit() {
   if (busy.value) return
@@ -52,10 +81,7 @@ async function submit() {
       message.value = 'Tu cuenta está lista. Inicia sesión para comenzar.'
     } else {
       signIn(await authService.login(credentials))
-      // Vuelve a la página que pidió iniciar sesión (por ejemplo, la compra). Solo rutas internas.
-      const next = route.query.next
-      const internal = typeof next === 'string' && next.startsWith('/') && !next.startsWith('//')
-      await router.push(internal ? next : '/')
+      await goAfterLogin()
     }
   } catch (failure) {
     error.value = failure.message
@@ -172,6 +198,11 @@ async function submit() {
         </p>
       </q-form>
 
+      <div v-if="googleClientId && !message" class="auth-google">
+        <div class="auth-divider"><span>o</span></div>
+        <div ref="googleButton" class="auth-google-btn"></div>
+      </div>
+
       <p class="auth-switch">
         {{ register ? '¿Ya tienes una cuenta?' : '¿Todavía no tienes cuenta?' }}
         <router-link :to="{ path: register ? '/login' : '/registro', query: nextQuery }">{{
@@ -181,3 +212,10 @@ async function submit() {
     </section>
   </q-page>
 </template>
+
+<style scoped>
+.auth-google { margin-top: 16px; }
+.auth-divider { display: flex; align-items: center; gap: 12px; color: #6b6585; font-size: 13px; margin-bottom: 14px; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #e3e0ef; }
+.auth-google-btn { display: flex; justify-content: center; min-height: 44px; }
+</style>

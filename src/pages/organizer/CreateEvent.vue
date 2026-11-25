@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { eventService } from '@/services/eventService'
 import FlyerImport from '@/components/FlyerImport.vue'
@@ -89,37 +89,68 @@ function applyDraft({ draft, file }) {
   errorMsg.value = ''
   const filled = []
   const missing = []
-  const set = (label, value, apply) => {
-    if (value === null || value === undefined || value === '') missing.push(label)
-    else {
+  const has = (value) => value !== null && value !== undefined && value !== ''
+  // Un dato que no está en el flyer se deja en blanco (no se conservan valores por defecto).
+  const set = (label, value, apply, blank) => {
+    if (has(value)) {
       apply(value)
       filled.push(label)
+    } else {
+      blank()
+      missing.push(label)
     }
   }
-  set('nombre', draft.nombre, (v) => (form.nombre = v))
-  set('descripción', draft.descripcion, (v) => (form.descripcion = v))
-  set('categoría', draft.categoria, (v) => {
-    const match = categories.value.find((c) => normalize(c.label) === normalize(v))
-    if (match) form.categoriaId = match.value
-    else missing.push('categoría')
-  })
-  set('fecha de inicio', draft.fechaInicio, (v) => (form.fechaInicio = v))
-  set('hora de inicio', draft.horaInicio, (v) => (form.horaInicio = v))
-  if (draft.fechaFin) form.fechaFin = draft.fechaFin
-  if (draft.horaFin) form.horaFin = draft.horaFin
-  set('ciudad', draft.ciudad, (v) => (form.ciudad = v))
-  set('recinto', draft.nombreLugar, (v) => (form.nombreLugar = v))
-  set('dirección', draft.direccion, (v) => (form.direccion = v))
-  set('precio', draft.precio, (v) => (form.precio = Number(v)))
-  set('aforo', draft.aforo, (v) => (form.aforo = Number(v)))
-  draftNotice.value = filled.length
-    ? `Borrador generado desde el flyer. Revisa todos los datos antes de guardar.${
-        missing.length ? ` No se detectó: ${missing.join(', ')}.` : ''
-      }`
+  set('nombre', draft.nombre, (v) => (form.nombre = v), () => (form.nombre = ''))
+  set('descripción', draft.descripcion, (v) => (form.descripcion = v), () => (form.descripcion = ''))
+  set(
+    'categoría',
+    draft.categoria,
+    (v) => {
+      const match = categories.value.find((c) => normalize(c.label) === normalize(v))
+      form.categoriaId = match ? match.value : null
+    },
+    () => (form.categoriaId = null)
+  )
+  set('fecha de inicio', draft.fechaInicio, (v) => (form.fechaInicio = v), () => (form.fechaInicio = ''))
+  set('hora de inicio', draft.horaInicio, (v) => (form.horaInicio = v), () => (form.horaInicio = ''))
+  form.fechaFin = draft.fechaFin || ''
+  form.horaFin = draft.horaFin || ''
+  set('ciudad', draft.ciudad, (v) => (form.ciudad = v), () => (form.ciudad = ''))
+  set('recinto', draft.nombreLugar, (v) => (form.nombreLugar = v), () => (form.nombreLugar = ''))
+  set('dirección', draft.direccion, (v) => (form.direccion = v), () => (form.direccion = ''))
+  set('precio', draft.precio, (v) => (form.precio = Number(v)), () => (form.precio = ''))
+  set('aforo', draft.aforo, (v) => (form.aforo = Number(v)), () => (form.aforo = ''))
+
+  let notice = filled.length
+    ? 'Borrador generado desde el flyer. Revisa todos los datos antes de guardar.'
     : 'No se pudo detectar información del evento en la imagen. Prueba con otra más nítida o llena el formulario a mano.'
-  if (useAsCover.value && file) onImageSelected(file)
+  if (filled.length && missing.length) {
+    notice += ` No aparece en el flyer y quedó en blanco: ${missing.join(', ')}.`
+  }
+  if (draft.fechaInicio && draft.anioIndicado === false) {
+    notice += ` El flyer no indica el año: se asumió ${draft.fechaInicio.slice(0, 4)}, verifícalo.`
+  }
+  draftNotice.value = notice
+  lastFlyerFile.value = file || null
+  if (useAsCover.value && file) void uploadFlyerAsCover(file)
 }
 const useAsCover = ref(false)
+const lastFlyerFile = ref(null)
+const COVER_OK = ' Portada: el flyer se cargó como imagen del evento.'
+const COVER_FAIL = ' No se pudo cargar el flyer como portada: '
+
+// Sube el flyer como portada y lo informa en el aviso (si falla, se ve junto al flyer).
+async function uploadFlyerAsCover(file) {
+  draftNotice.value = draftNotice.value.split(COVER_OK)[0].split(COVER_FAIL)[0]
+  await onImageSelected(file)
+  if (form.imagenUrl) draftNotice.value += COVER_OK
+  else draftNotice.value += COVER_FAIL + (errorMsg.value || 'error desconocido.')
+}
+
+// Si se marca la casilla después de analizar el flyer, también se aplica.
+watch(useAsCover, (on) => {
+  if (on && lastFlyerFile.value && !uploadingImage.value) void uploadFlyerAsCover(lastFlyerFile.value)
+})
 
 const capacityRule = (val) => {
   const base = positiveIntRule(val)
@@ -199,6 +230,10 @@ async function submitEvent(shouldPublish) {
   }
   if (!form.fechaInicio || !form.horaInicio) {
     errorMsg.value = 'Indica la fecha y hora de inicio del evento.'
+    return
+  }
+  if (form.aforo === '' || form.aforo === null || form.precio === '' || form.precio === null) {
+    errorMsg.value = 'Indica el aforo y el precio de entrada (0 si es gratis).'
     return
   }
   if (isEditMode.value && Number(form.aforo) < soldTickets.value) {

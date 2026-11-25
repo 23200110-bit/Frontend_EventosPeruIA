@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { eventService } from '@/services/eventService'
+import FlyerImport from '@/components/FlyerImport.vue'
 import {
   maxLengthRule,
   nonNegativeNumberRule,
@@ -78,6 +79,47 @@ async function onImageSelected(file) {
     uploadingImage.value = false
   }
 }
+
+// Borrador sugerido desde un flyer: solo rellena lo detectado; nada se guarda hasta que la persona lo decida.
+const draftNotice = ref('')
+const normalize = (text) =>
+  String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+
+function applyDraft({ draft, file }) {
+  errorMsg.value = ''
+  const filled = []
+  const missing = []
+  const set = (label, value, apply) => {
+    if (value === null || value === undefined || value === '') missing.push(label)
+    else {
+      apply(value)
+      filled.push(label)
+    }
+  }
+  set('nombre', draft.nombre, (v) => (form.nombre = v))
+  set('descripción', draft.descripcion, (v) => (form.descripcion = v))
+  set('categoría', draft.categoria, (v) => {
+    const match = categories.value.find((c) => normalize(c.label) === normalize(v))
+    if (match) form.categoriaId = match.value
+    else missing.push('categoría')
+  })
+  set('fecha de inicio', draft.fechaInicio, (v) => (form.fechaInicio = v))
+  set('hora de inicio', draft.horaInicio, (v) => (form.horaInicio = v))
+  if (draft.fechaFin) form.fechaFin = draft.fechaFin
+  if (draft.horaFin) form.horaFin = draft.horaFin
+  set('ciudad', draft.ciudad, (v) => (form.ciudad = v))
+  set('recinto', draft.nombreLugar, (v) => (form.nombreLugar = v))
+  set('dirección', draft.direccion, (v) => (form.direccion = v))
+  set('precio', draft.precio, (v) => (form.precio = Number(v)))
+  set('aforo', draft.aforo, (v) => (form.aforo = Number(v)))
+  draftNotice.value = filled.length
+    ? `Borrador generado desde el flyer. Revisa todos los datos antes de guardar.${
+        missing.length ? ` No se detectó: ${missing.join(', ')}.` : ''
+      }`
+    : 'No se pudo detectar información del evento en la imagen. Prueba con otra más nítida o llena el formulario a mano.'
+  if (useAsCover.value && file) onImageSelected(file)
+}
+const useAsCover = ref(false)
 
 const capacityRule = (val) => {
   const base = positiveIntRule(val)
@@ -242,7 +284,29 @@ onMounted(init)
       <q-spinner color="primary" size="28px" /> Cargando información...
     </div>
 
-    <q-form v-else class="surface" style="border-radius: 20px; padding: 28px;" @submit.prevent="submitEvent(true)">
+    <FlyerImport
+      v-if="!loadingData && !isEditMode"
+      :categories="categories"
+      :disabled="saving || uploadingImage"
+      @draft="applyDraft"
+    />
+    <q-checkbox
+      v-if="!loadingData && !isEditMode"
+      v-model="useAsCover"
+      dense
+      label="Usar también el flyer como imagen de portada del evento"
+      style="margin: -6px 0 14px;"
+    />
+    <q-banner
+      v-if="draftNotice"
+      rounded
+      class="bg-blue-1 text-primary"
+      style="margin-bottom: 16px;"
+    >
+      {{ draftNotice }}
+    </q-banner>
+
+    <q-form v-if="!loadingData" class="surface" style="border-radius: 20px; padding: 28px;" @submit.prevent="submitEvent(true)">
       <div style="display: grid; gap: 18px;">
         <!-- Nombre y Categoría -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">

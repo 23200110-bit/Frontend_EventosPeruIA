@@ -36,6 +36,10 @@ export const eventService = {
   getMyEventDetail(id) {
     return get(`/eventos/mis-eventos/${id}`)
   },
+  // Sugiere un borrador a partir de un flyer; no guarda nada.
+  draftFromFlyer(payload) {
+    return post('/eventos/flyer-borrador', payload, { timeoutMs: 90000 })
+  },
   createEvent(payload) {
     return post('/eventos', payload)
   },

@@ -44,6 +44,38 @@ function sourceLabel(source, index) {
   )
 }
 
+// El RAG no recuerda la conversación: en preguntas cortas ("¿dónde compro entradas a ese evento?")
+// se le antepone la pregunta anterior del usuario para que "ese evento" tenga contexto.
+function ragQuery(mensaje, state) {
+  if (mensaje.length > 80) return mensaje
+  // El turno actual ya está en la lista: la pregunta anterior es el penúltimo turno del usuario.
+  const previous = state.turns.filter((turn) => turn.role === 'user').slice(-2, -1)[0]
+  if (!previous?.text) return mensaje
+  return `${previous.text}\n${mensaje}`.slice(0, 2000)
+}
+
+// La respuesta principal es la que está respaldada por datos: el RAG solo si encontró fuentes;
+// si el catálogo encontró eventos, manda el catálogo y el RAG queda como información adicional.
+function composeReply(catalog, rag) {
+  const ragHasAnswer = Boolean(rag?.reply) && Array.isArray(rag.sources) && rag.sources.length > 0
+  const catalogHasEvents = Boolean(catalog?.eventos?.length)
+  if (catalogHasEvents && catalog?.respuesta) {
+    return {
+      text: catalog.respuesta,
+      extra: ragHasAnswer ? rag.reply : '',
+      extraTitle: 'Información adicional',
+      useRag: ragHasAnswer
+    }
+  }
+  if (ragHasAnswer) return { text: rag.reply, extra: '', extraTitle: '', useRag: true }
+  return {
+    text: catalog?.respuesta || rag?.reply || 'No se recibió una respuesta.',
+    extra: '',
+    extraTitle: '',
+    useRag: false
+  }
+}
+
 function actionLabel(action) {
   return String(action).replaceAll('_', ' ')
 }
@@ -89,7 +121,7 @@ async function send(value = chatState.value.draft) {
     } else {
       const [catalogResult, ragResult] = await Promise.allSettled([
         chatService.sendMessage({ mensaje, conversacionId: state.id }),
-        chatService.sendRagMessage(mensaje)
+        chatService.sendRagMessage(ragQuery(mensaje, state))
       ])
       if (chatState.value !== state) return
 
@@ -104,12 +136,14 @@ async function send(value = chatState.value.draft) {
       }
 
       if (catalog) state.id = catalog.conversacionId
+      const reply = composeReply(catalog, rag)
       state.turns.push({
         role: 'assistant',
-        text: rag?.reply || catalog?.respuesta || 'No se recibió una respuesta.',
-        catalogReply: rag?.reply && catalog?.eventos?.length ? catalog.respuesta : '',
+        text: reply.text,
+        extraTitle: reply.extraTitle,
+        extraReply: reply.extra,
         events: catalog?.eventos || [],
-        sources: Array.isArray(rag?.sources) ? rag.sources : []
+        sources: reply.useRag && Array.isArray(rag?.sources) ? rag.sources : []
       })
       if (!catalog || !rag) {
         const failedRequest = catalog ? ragResult : catalogResult
@@ -179,9 +213,9 @@ async function send(value = chatState.value.draft) {
             }}
           </span>
           <div class="assistant-bubble">{{ turn.text }}</div>
-          <div v-if="turn.catalogReply" class="assistant-catalog-reply">
-            <strong>Detalle del catálogo</strong>
-            <p>{{ turn.catalogReply }}</p>
+          <div v-if="turn.extraReply" class="assistant-catalog-reply">
+            <strong>{{ turn.extraTitle }}</strong>
+            <p>{{ turn.extraReply }}</p>
           </div>
           <details
             v-if="turn.role === 'assistant' && turn.sources?.length"

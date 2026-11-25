@@ -158,7 +158,7 @@ async function handleDownload() {
           <div v-if="isCanceled" class="voucher-ticket__refund">
             <q-icon name="info" size="18px" />
             <div>
-              <strong>Pendiente de reembolso</strong>
+              <strong>{{ ticket.pendienteReembolso ? 'Pendiente de reembolso' : 'Entrada anulada' }}</strong>
               <p v-if="ticket.motivoCancelacion">{{ ticket.motivoCancelacion }}</p>
             </div>
           </div>

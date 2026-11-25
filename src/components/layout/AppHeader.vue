@@ -1,14 +1,35 @@
 <script setup>
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { session, signOut } from '@/stores/authStore'
+import { clearUnread, notificationState, refreshUnread } from '@/stores/notificationStore'
 
 const route = useRoute()
 const router = useRouter()
 const menu = ref(false)
 
+// Puntito rojo de "Avisos": se actualiza al iniciar sesión, al cambiar de página y cada minuto.
+let timer = null
+function startPolling() {
+  stopPolling()
+  if (!session.token) return clearUnread()
+  void refreshUnread()
+  timer = setInterval(refreshUnread, 60000)
+}
+function stopPolling() {
+  if (timer) clearInterval(timer)
+  timer = null
+}
+onMounted(startPolling)
+onBeforeUnmount(stopPolling)
+watch(() => session.token, startPolling)
+watch(() => route.fullPath, () => {
+  if (session.token) void refreshUnread()
+})
+
 function logout() {
   menu.value = false
+  clearUnread()
   signOut()
   router.push('/login')
 }
@@ -50,7 +71,14 @@ function logout() {
           <!-- SANTIAGO CHECK-IN -->
           <router-link v-if="!session.user.isAdministrator" to="/organizador/asistentes" active-class="nav-pill-active">Check-in Puerta</router-link>
           <!-- ---------------- -->
-          <router-link to="/avisos" active-class="nav-pill-active">Avisos</router-link>
+          <router-link to="/avisos" active-class="nav-pill-active">
+            Avisos
+            <span
+              v-if="notificationState.unread > 0"
+              class="unread-dot"
+              :aria-label="`${notificationState.unread} avisos sin leer`"
+            >{{ notificationState.unread > 9 ? '9+' : notificationState.unread }}</span>
+          </router-link>
           <router-link v-if="session.user.isAdministrator" to="/admin" active-class="nav-pill-active">Admin</router-link>
         </template>
 
@@ -102,7 +130,14 @@ function logout() {
         <!-- SANTIAGO CHECK-IN -->
         <router-link v-if="!session.user.isAdministrator" to="/organizador/asistentes" active-class="nav-pill-active" @click="menu = false">Check-in Puerta</router-link>
         <!-- ---------------- -->
-        <router-link to="/avisos" active-class="nav-pill-active" @click="menu = false">Avisos</router-link>
+        <router-link to="/avisos" active-class="nav-pill-active" @click="menu = false">
+          Avisos
+          <span
+          v-if="notificationState.unread > 0"
+          class="unread-dot"
+          :aria-label="`${notificationState.unread} avisos sin leer`"
+            >{{ notificationState.unread > 9 ? '9+' : notificationState.unread }}</span>
+        </router-link>
         <router-link v-if="session.user.isAdministrator" to="/admin" active-class="nav-pill-active" @click="menu = false">Panel admin</router-link>
       </template>
 
@@ -113,3 +148,22 @@ function logout() {
     </nav>
   </q-header>
 </template>
+
+<style scoped>
+.unread-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+  border-radius: 9px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+}
+</style>

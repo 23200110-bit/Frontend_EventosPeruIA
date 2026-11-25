@@ -8,8 +8,15 @@ import '@/assets/styles/experience.css'
 import '@/assets/styles/theme-blue.css'
 import App from './App.vue'
 import router from './router'
+import { installClientErrorReporting, reportVueError } from '@/services/clientErrorReporter'
 
-createApp(App)
+const app = createApp(App)
+
+app.config.errorHandler = reportVueError
+
+installClientErrorReporting()
+
+app
   .use(Quasar, {
     lang: es,
     config: {

@@ -10,5 +10,14 @@ export const chatService = {
       },
       { timeoutMs: 180000 }
     )
+  },
+  sendRagMessage(message) {
+    return post('/chat', { message }, { timeoutMs: 180000 })
+  },
+  runAgent(prompt) {
+    return post('/admin/agent', { prompt }, { timeoutMs: 180000 })
+  },
+  reportClientError(description) {
+    return post('/ai/bug-reports', { description }, { timeoutMs: 15000 })
   }
 }

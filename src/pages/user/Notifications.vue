@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { userService } from '@/services/userService'
 import { date } from '@/utils/formatters'
+import { setUnreadFromList } from '@/stores/notificationStore'
 
 const items = ref([])
 const busy = ref(true)
@@ -11,6 +12,7 @@ async function load() {
   busy.value = true
   try {
     items.value = await userService.getNotifications()
+    setUnreadFromList(items.value)
   } catch (e) {
     error.value = e.message
   } finally {
@@ -22,6 +24,7 @@ async function mark(item) {
   try {
     await userService.markNotificationRead(item.id)
     item.read = true
+    setUnreadFromList(items.value)
   } catch (e) {
     error.value = e.message
   }

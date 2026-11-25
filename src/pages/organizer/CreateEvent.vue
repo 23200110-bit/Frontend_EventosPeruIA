@@ -14,6 +14,9 @@ const route = useRoute()
 const router = useRouter()
 
 const isEditMode = computed(() => Boolean(route.params.id))
+const eventForm = ref(null)
+const originalEvent = ref(null)
+const isDraft = computed(() => !isEditMode.value || originalEvent.value?.estado === 'Borrador')
 const categories = ref([])
 const loadingData = ref(false)
 const saving = ref(false)
@@ -24,6 +27,10 @@ const soldTickets = ref(0)
 // Estado para subida de imagen a Supabase Storage
 const imageFile = ref(null)
 const uploadingImage = ref(false)
+const saveBlocked = computed(
+  () => saving.value || uploadingImage.value || Boolean(successMsg.value) ||
+    (isEditMode.value && !originalEvent.value)
+)
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
@@ -161,22 +168,40 @@ const capacityRule = (val) => {
   return true
 }
 
-function toIsoPeru(dateStr, timeStr) {
-  if (!dateStr) return null
-  const cleanTime = timeStr && timeStr.length >= 5 ? timeStr.slice(0, 5) : '00:00'
-  return `${dateStr}T${cleanTime}:00-05:00`
-}
+const limaDateTime = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'America/Lima',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23'
+})
 
 function splitIsoDateTime(isoStr) {
   if (!isoStr) return { date: '', time: '' }
-  const d = new Date(isoStr)
-  if (Number.isNaN(d.getTime())) return { date: '', time: '' }
-  const yyyy = d.getFullYear()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  const hh = String(d.getHours()).padStart(2, '0')
-  const min = String(d.getMinutes()).padStart(2, '0')
-  return { date: `${yyyy}-${mm}-${dd}`, time: `${hh}:${min}` }
+
+  const instant = new Date(isoStr)
+  if (Number.isNaN(instant.getTime())) return { date: '', time: '' }
+
+  const parts = Object.fromEntries(
+    limaDateTime.formatToParts(instant).map(({ type, value }) => [type, value])
+  )
+
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    time: `${parts.hour}:${parts.minute}`
+  }
+}
+
+function toIsoPeru(dateStr, timeStr, originalIso) {
+  if (!dateStr) return null
+
+  const cleanTime = timeStr && timeStr.length >= 5 ? timeStr.slice(0, 5) : '00:00'
+  const original = splitIsoDateTime(originalIso)
+  if (original.date === dateStr && original.time === cleanTime) return originalIso
+
+  return `${dateStr}T${cleanTime}:00-05:00`
 }
 
 async function init() {
@@ -192,6 +217,7 @@ async function init() {
 
     if (isEditMode.value) {
       const detail = await eventService.getMyEventDetail(route.params.id)
+      originalEvent.value = detail
       form.nombre = detail.nombre || ''
       form.descripcion = detail.descripcion || ''
       form.categoriaId = detail.categoria?.categoriaId ?? null
@@ -220,7 +246,17 @@ async function init() {
   }
 }
 
+async function publishEvent() {
+  if (!isDraft.value || saveBlocked.value) return
+
+  if (await eventForm.value?.validate()) {
+    await submitEvent(true)
+  }
+}
+
 async function submitEvent(shouldPublish) {
+  if (saveBlocked.value) return
+
   errorMsg.value = ''
   successMsg.value = ''
 
@@ -245,24 +281,29 @@ async function submitEvent(shouldPublish) {
     categoriaId: Number(form.categoriaId),
     nombre: form.nombre.trim(),
     descripcion: form.descripcion.trim(),
-    fechaInicio: toIsoPeru(form.fechaInicio, form.horaInicio),
-    fechaFin: form.fechaFin ? toIsoPeru(form.fechaFin, form.horaFin || '23:59') : null,
+    fechaInicio: toIsoPeru(form.fechaInicio, form.horaInicio, originalEvent.value?.fechaInicio),
+    fechaFin: toIsoPeru(form.fechaFin, form.horaFin || '23:59', originalEvent.value?.fechaFin),
     direccion: form.direccion.trim(),
     ciudad: form.ciudad.trim(),
-    latitud: null,
-    longitud: null,
+    latitud: originalEvent.value?.latitud ?? null,
+    longitud: originalEvent.value?.longitud ?? null,
     aforo: Number(form.aforo),
     precio: Number(form.precio),
     publicar: shouldPublish,
-    imagenUrl: form.imagenUrl.trim() || null,
-    nombreLugar: form.nombreLugar.trim() || null
+    imagenUrl: form.imagenUrl?.trim() || null,
+    nombreLugar: form.nombreLugar?.trim() || null
   }
 
   saving.value = true
   try {
     if (isEditMode.value) {
-      await eventService.updateEvent(route.params.id, payload)
-      successMsg.value = 'Evento actualizado correctamente.'
+      await eventService.updateEvent(route.params.id, {
+        ...payload,
+        versionFila: originalEvent.value?.versionFila ?? null
+      })
+      successMsg.value = shouldPublish
+        ? '¡Evento publicado con éxito!'
+        : 'Evento actualizado correctamente.'
     } else {
       await eventService.createEvent(payload)
       successMsg.value = shouldPublish
@@ -341,7 +382,13 @@ onMounted(init)
       {{ draftNotice }}
     </q-banner>
 
-    <q-form v-if="!loadingData" class="surface" style="border-radius: 20px; padding: 28px;" @submit.prevent="submitEvent(true)">
+    <q-form
+      v-if="!loadingData"
+      ref="eventForm"
+      class="surface"
+      style="border-radius: 20px; padding: 28px;"
+      @submit.prevent="submitEvent(false)"
+    >
       <div style="display: grid; gap: 18px;">
         <!-- Nombre y Categoría -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
@@ -484,7 +531,7 @@ onMounted(init)
               bg-color="white"
               label="O pega una URL de imagen de portada"
               placeholder="https://..."
-              :disable="uploadingImage"
+              :disable="uploadingImage || saving"
             />
           </div>
 
@@ -513,29 +560,30 @@ onMounted(init)
           />
 
           <q-btn
-            v-if="!isEditMode"
-            outline
+            :outline="isDraft"
+            :unelevated="!isDraft"
             rounded
             no-caps
             color="primary"
-            icon="save"
-            label="Guardar como borrador"
+            :icon="isDraft ? 'save' : 'check'"
+            :label="isDraft ? 'Guardar como borrador' : 'Actualizar evento'"
+            type="submit"
             :loading="saving"
-            :disable="uploadingImage"
-            @click="submitEvent(false)"
+            :disable="saveBlocked"
           />
 
           <q-btn
-            :key="isEditMode ? 'btn-edit' : 'btn-create'"
+            v-if="isDraft"
             unelevated
             rounded
             no-caps
             color="primary"
-            :icon="isEditMode ? 'check' : 'publish'"
-            :label="isEditMode ? 'Actualizar evento' : 'Publicar evento'"
-            type="submit"
+            icon="publish"
+            label="Publicar evento"
+            type="button"
             :loading="saving"
-            :disable="uploadingImage"
+            :disable="saveBlocked"
+            @click="publishEvent"
           />
         </div>
       </div>

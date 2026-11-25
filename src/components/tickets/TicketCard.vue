@@ -67,7 +67,7 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
       <div v-if="isCanceled" class="ticket-card__alert">
         <q-icon name="info" size="16px" />
         <span>
-          <strong>Pendiente de reembolso</strong>
+          <strong>{{ ticket.pendienteReembolso ? 'Pendiente de reembolso' : 'Entrada anulada' }}</strong>
           <template v-if="ticket.motivoCancelacion"> · {{ ticket.motivoCancelacion }}</template>
         </span>
       </div>

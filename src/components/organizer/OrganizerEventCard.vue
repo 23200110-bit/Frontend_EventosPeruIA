@@ -14,7 +14,8 @@ const totalCapacity = computed(() => Number(props.event.aforo ?? 0))
 const progressRatio = computed(() =>
   totalCapacity.value > 0 ? Math.min(soldCount.value / totalCapacity.value, 1) : 0
 )
-const estimatedRevenue = computed(() => soldCount.value * Number(props.event.precio ?? 0))
+// Ingreso real cobrado (suma de lo pagado por cada entrada); no cambia al editar el precio.
+const estimatedRevenue = computed(() => Number(props.event.ingresosTotales ?? 0))
 
 const isPendingReview = computed(() => {
   const st = (props.event.estado || '').toLowerCase()

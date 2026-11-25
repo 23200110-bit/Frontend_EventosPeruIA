@@ -42,7 +42,8 @@ const kpis = computed(() => {
     0
   )
   const revenue = events.value.reduce(
-    (acc, e) => acc + Number(e.ticketsVendidos ?? 0) * Number(e.precio ?? 0),
+    // Ingreso real cobrado (lo que pagó cada comprador); no depende del precio actual del evento.
+    (acc, e) => acc + Number(e.ingresosTotales ?? 0),
     0
   )
   return { total, published, ticketsSold, revenue }

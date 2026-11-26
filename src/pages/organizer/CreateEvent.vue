@@ -360,12 +360,11 @@ onMounted(init)
         </div>
 
         <!-- Imagen de portada (Subir archivo a Supabase Storage o pegar URL) -->
-        <div style="display: grid; gap: 12px; padding: 16px; border: 1px dashed #cbd5e1; border-radius: 14px; background: #f8fafc;">
+        <div style="display: grid; gap: 12px; padding: 16px; border: 1px dashed var(--border-color); border-radius: 14px; background: var(--bg-secondary);">
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
             <q-file
               v-model="imageFile"
               outlined
-              bg-color="white"
               accept="image/*"
               max-file-size="5242880"
               label="Subir imagen desde tu dispositivo (máx. 5 MB)"
@@ -382,7 +381,6 @@ onMounted(init)
               v-model="form.imagenUrl"
               outlined
               clearable
-              bg-color="white"
               label="O pega una URL de imagen de portada"
               placeholder="https://..."
               :disable="uploadingImage"
@@ -393,9 +391,9 @@ onMounted(init)
             <img
               :src="form.imagenUrl"
               alt="Vista previa de portada"
-              style="width: 140px; height: 84px; flex-shrink: 0; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0;"
+              style="width: 140px; height: 84px; flex-shrink: 0; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-color);"
             />
-            <div style="font-size: 0.85rem; color: #475569; min-width: 0; overflow-wrap: anywhere;">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); min-width: 0; overflow-wrap: anywhere;">
               <strong>Portada lista</strong>
               <div>{{ form.imagenUrl }}</div>
             </div>
@@ -403,7 +401,7 @@ onMounted(init)
         </div>
 
         <!-- Botones de acción -->
-        <div style="display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-top: 8px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+        <div style="display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 20px;">
           <q-btn
             flat
             no-caps

@@ -182,7 +182,7 @@ onBeforeUnmount(() => {
             :rules="[quantityRule]"
           />
 
-          <h3>Resumen de tu compra</h3>
+          <h3 class="checkout-summary-title">Resumen de tu compra</h3>
           <q-markup-table flat bordered>
             <tbody>
               <tr>
@@ -218,6 +218,7 @@ onBeforeUnmount(() => {
           no-caps
           color="primary"
           label="Confirmar compra"
+          class="btn-buy"
           :loading="buying"
           :disable="!canBuy"
           @click="confirm"
@@ -227,3 +228,13 @@ onBeforeUnmount(() => {
     </template>
   </q-page>
 </template>
+
+<style scoped>
+.checkout-summary-title {
+  margin: 18px 0 8px;
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+</style>

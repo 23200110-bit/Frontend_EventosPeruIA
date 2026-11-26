@@ -1,0 +1,3889 @@
+diff --git a/src/assets/styles/experience.css b/src/assets/styles/experience.css
+index 7dcddd0..197ba87 100644
+--- a/src/assets/styles/experience.css
++++ b/src/assets/styles/experience.css
+@@ -9,7 +9,37 @@
+   background: #faf8ff;
+ }
+ 
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) {
++    --ink: #f5f3ff;
++    --muted-ink: #b8b0d0;
++    --brand: #7c5cf5;
++    --line: #3d3550;
++    --wash: #1a1829;
++    --gold: #ffdc83;
++  }
++}
++
++:root[data-theme="dark"] {
++  --ink: #f5f3ff;
++  --muted-ink: #b8b0d0;
++  --brand: #7c5cf5;
++  --line: #3d3550;
++  --wash: #1a1829;
++  --gold: #ffdc83;
++}
++
+ body { background: #faf8ff; }
++
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) body {
++    background: #0f0d1b;
++  }
++}
++
++:root[data-theme="dark"] body {
++  background: #0f0d1b;
++}
+ a { color: var(--brand); }
+ a:focus-visible { outline-color: var(--brand); }
+ .topbar { background: #fff; color: var(--ink); border-color: var(--line); }
+@@ -72,10 +102,31 @@ a:focus-visible { outline-color: var(--brand); }
+   background: var(--brand); color: white; border-radius: 16px;
+ }
+ .assistant-panel { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: #fff; }
++
++@media (prefers-color-scheme: dark) {
++  .assistant-panel:not([data-theme="light"]) {
++    background: #1a1829;
++  }
++}
++
++:root[data-theme="dark"] .assistant-panel {
++  background: #1a1829;
++}
++
+ .assistant-messages {
+   display: flex; flex-direction: column; gap: 18px; overflow: auto;
+   padding: clamp(16px, 4vw, 32px); height: clamp(280px, 52vh, 620px); background: #fcfaff;
+ }
++
++@media (prefers-color-scheme: dark) {
++  .assistant-messages:not([data-theme="light"]) {
++    background: #252236;
++  }
++}
++
++:root[data-theme="dark"] .assistant-messages {
++  background: #252236;
++}
+ .assistant-turn { max-width: min(88%, 650px); }
+ .assistant-turn--user { align-self: flex-end; }
+ .assistant-speaker { display: block; font-size: 12px; font-weight: 700; color: var(--muted-ink); margin: 0 6px 4px; }
+diff --git a/src/assets/styles/style.css b/src/assets/styles/style.css
+index 5433723..6309deb 100644
+--- a/src/assets/styles/style.css
++++ b/src/assets/styles/style.css
+@@ -1,35 +1,220 @@
+ :root {
+-  font-family: Arial, Helvetica, sans-serif;
+-  color: #243c32;
+-  background: #faf9f5;
++  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
++
++  /* Light mode (default) */
++  --bg-primary: #ffffff;
++  --bg-secondary: #f9f8ff;
++  --bg-tertiary: #f3f0ff;
++  --text-primary: #1f1f2e;
++  --text-secondary: #666673;
++  --text-tertiary: #99999b;
++  --border-color: #e5e0f0;
++  --brand: #5038b9;
++  --brand-dark: #3d2a7f;
++  --brand-light: #6e5cd4;
++  --accent: #ffdc83;
++  --accent-light: #fff9e6;
++  --success: #10b981;
++  --warning: #f59e0b;
++  --danger: #ef4444;
++  --shadow-sm: 0 1px 2px rgba(31, 31, 46, 0.05);
++  --shadow-md: 0 4px 12px rgba(31, 31, 46, 0.1);
++  --shadow-lg: 0 10px 25px rgba(31, 31, 46, 0.12);
++
++  color-scheme: light;
++}
++
++/* Dark mode */
++@media (prefers-color-scheme: dark) {
++  :root {
++    --bg-primary: #0f0d1b;
++    --bg-secondary: #1a1829;
++    --bg-tertiary: #252236;
++    --text-primary: #f5f3ff;
++    --text-secondary: #c5c0d8;
++    --text-tertiary: #8e8899;
++    --border-color: #3d3550;
++    --brand: #7c5cf5;
++    --brand-dark: #5a3fc9;
++    --brand-light: #9d85ff;
++    --accent: #ffdc83;
++    --accent-light: #3d2a05;
++    --success: #34d399;
++    --warning: #fbbf24;
++    --danger: #f87171;
++    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
++    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
++    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
++
++    color-scheme: dark;
++  }
++}
++
++/* Manual dark mode override */
++:root[data-theme="dark"] {
++  --bg-primary: #0f0d1b;
++  --bg-secondary: #1a1829;
++  --bg-tertiary: #252236;
++  --text-primary: #f5f3ff;
++  --text-secondary: #c5c0d8;
++  --text-tertiary: #8e8899;
++  --border-color: #3d3550;
++  --brand: #7c5cf5;
++  --brand-dark: #5a3fc9;
++  --brand-light: #9d85ff;
++  --accent: #ffdc83;
++  --accent-light: #3d2a05;
++  --success: #34d399;
++  --warning: #fbbf24;
++  --danger: #f87171;
++  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
++  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
++  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+ }
+ 
+-body { background: #faf9f5; }
+-a { color: #245444; text-decoration: none; }
++/* Manual light mode override */
++:root[data-theme="light"] {
++  --bg-primary: #ffffff;
++  --bg-secondary: #f9f8ff;
++  --bg-tertiary: #f3f0ff;
++  --text-primary: #1f1f2e;
++  --text-secondary: #666673;
++  --text-tertiary: #99999b;
++  --border-color: #e5e0f0;
++  --brand: #5038b9;
++  --brand-dark: #3d2a7f;
++  --brand-light: #6e5cd4;
++  --accent: #ffdc83;
++  --accent-light: #fff9e6;
++  --success: #10b981;
++  --warning: #f59e0b;
++  --danger: #ef4444;
++}
++
++body {
++  background: var(--bg-secondary);
++  color: var(--text-primary);
++  transition: background-color 0.3s ease, color 0.3s ease;
++}
++a {
++  color: var(--brand);
++  text-decoration: none;
++}
+ h1, h2, h3, p { margin-top: 0; }
+ button, a, input { touch-action: manipulation; }
+-a:focus-visible { outline: 3px solid #d97142; outline-offset: 4px; }
++a:focus-visible { outline: 3px solid var(--brand); outline-offset: 4px; }
+ 
+-.topbar { background: #faf9f5; color: #263e34; border-bottom: 1px solid #dedfd5; }
+-.toolbar { max-width: 1240px; margin: auto; min-height: 84px; gap: 15px; }
+-.brand { display: inline-flex; align-items: center; font-size: 22px; font-weight: 750; letter-spacing: -1px; white-space: nowrap; }
+-.brand-mark { display: grid; place-items: center; border-radius: 14px; background: #245444; color: white; width: 42px; height: 42px; margin-right: 9px; font-size: 30px; }
+-.brand-peru { color: #b15b38; }
+-.brand small { font-size: 10px; letter-spacing: 1px; border: 1px solid #a0afa5; padding: 3px; margin-left: 5px; align-self: center; }
+-.desktop-nav { display: flex; gap: 22px; align-items: center; font-size: 14px; }
+-.mobile-menu { display: none; }
++.topbar {
++  background: var(--bg-primary);
++  color: var(--text-primary);
++  border-bottom: 1px solid var(--border-color);
++  transition: background-color 0.3s ease, border-color 0.3s ease;
++}
++.toolbar {
++  max-width: 1240px;
++  margin: auto;
++  min-height: 72px;
++  gap: 15px;
++  display: flex;
++  align-items: center;
++  padding: 0 24px;
++}
++.brand {
++  display: inline-flex;
++  align-items: center;
++  font-size: 22px;
++  font-weight: 750;
++  letter-spacing: -1px;
++  white-space: nowrap;
++  color: var(--text-primary);
++}
++.brand-mark {
++  display: grid;
++  place-items: center;
++  border-radius: 14px;
++  background: var(--brand);
++  color: white;
++  width: 42px;
++  height: 42px;
++  margin-right: 9px;
++  font-size: 30px;
++  transition: background-color 0.3s ease;
++}
++.brand-peru { color: #c17a3a; }
++.brand small {
++  font-size: 10px;
++  letter-spacing: 1px;
++  border: 1px solid var(--border-color);
++  padding: 3px;
++  margin-left: 5px;
++  align-self: center;
++}
++.desktop-nav {
++  display: flex;
++  gap: 22px;
++  align-items: center;
++  font-size: 14px;
++}
++.theme-selector {
++  display: flex;
++  align-items: center;
++}
++.mobile-menu {
++  display: none;
++}
+ 
+ .container { max-width: 1190px; margin: auto; padding: 42px 24px 60px; }
+ .narrow { max-width: 760px; }
+ 
+-.hero { background: #eaeedf; display: flex; padding: 65px max(24px, calc((100vw - 1140px) / 2)); min-height: 390px; overflow: hidden; }
+-.hero-copy { min-width: 55%; z-index: 1; }
+-.eyebrow { font-size: 11px; font-weight: bold; letter-spacing: 2px; color: #53715d; margin-bottom: 18px; }
+-.hero h1 { font-size: clamp(35px, 4vw, 58px); line-height: 1.12; letter-spacing: -2px; margin-bottom: 22px; }
+-.hero h1 em { font-style: normal; color: #607c52; }
+-.hero p { font-size: 16px; line-height: 1.8; color: #526453; }
+-.hero-chips { display: flex; gap: 12px; font-size: 11px; margin-top: 22px; }
+-.hero-chips span { background: #f5f7ed; border: 1px solid #ccd4c0; border-radius: 20px; padding: 7px 12px; }
++.hero {
++  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
++  display: flex;
++  padding: 65px max(24px, calc((100vw - 1140px) / 2));
++  min-height: 390px;
++  overflow: hidden;
++  transition: background 0.3s ease;
++}
++.hero-copy {
++  min-width: 55%;
++  z-index: 1;
++}
++.eyebrow {
++  font-size: 11px;
++  font-weight: bold;
++  letter-spacing: 2px;
++  color: var(--text-secondary);
++  margin-bottom: 18px;
++}
++.hero h1 {
++  font-size: clamp(35px, 4vw, 58px);
++  line-height: 1.12;
++  letter-spacing: -2px;
++  margin-bottom: 22px;
++  color: white;
++}
++.hero h1 em {
++  font-style: normal;
++  color: var(--accent);
++}
++.hero p {
++  font-size: 16px;
++  line-height: 1.8;
++  color: rgba(255, 255, 255, 0.9);
++}
++.hero-chips {
++  display: flex;
++  gap: 12px;
++  font-size: 11px;
++  margin-top: 22px;
++  flex-wrap: wrap;
++}
++.hero-chips span {
++  background: rgba(255, 255, 255, 0.15);
++  border: 1px solid rgba(255, 255, 255, 0.3);
++  color: white;
++  border-radius: 20px;
++  padding: 7px 12px;
++}
+ .hero-art { position: relative; width: 380px; margin-left: 40px; flex-shrink: 0; }
+ .orbit { position: absolute; border: 1px solid #adbba0; border-radius: 50%; width: 380px; height: 380px; left: 0; top: -40px; }
+ .orbit.two { width: 470px; height: 470px; left: -45px; top: -85px; }
+@@ -40,61 +225,396 @@ a:focus-visible { outline: 3px solid #d97142; outline-offset: 4px; }
+ .ticket-line { border-top: 2px dashed #c6ccb9; margin: 24px -22px; }
+ .star { position: absolute; right: -10px; top: 90px; font-size: 100px; color: #d97142; transform: rotate(10deg); }
+ 
+-.search-panel { background: white; border: 1px solid #e0e3d9; border-radius: 16px; box-shadow: 0 8px 30px #243c3208; padding: 20px; display: grid; grid-template-columns: 2fr 1.2fr 1.1fr 1.1fr; gap: 12px; margin-top: -65px; position: relative; }
+-.section-title { display: flex; align-items: end; justify-content: space-between; margin: 50px 0 24px; }
+-.section-title h2 { font-size: 30px; letter-spacing: -1px; margin-bottom: 0; }
+-.section-title span { font-size: 12px; color: #69786d; }
+-.event-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+-.event-card { display: block; border: 1px solid #dde1d5; background: white; border-radius: 14px; overflow: hidden; transition: transform .18s, box-shadow .18s; }
+-.event-card:hover { transform: translateY(-4px); box-shadow: 0 12px 25px #243c3212; }
+-.event-cover { height: 158px; background: #e7dbc5; padding: 16px; position: relative; overflow: hidden; }
+-.event-cover span { background: #ffffffb8; border-radius: 20px; padding: 5px 10px; font-size: 10px; position: relative; z-index: 1; }
+-.event-cover strong { position: absolute; right: 25px; top: 6px; font: 140px Georgia, serif; color: #79634450; transform: rotate(-12deg); }
+-.cover-1 { background: #d7e2d4; }
+-.cover-2 { background: #ead8d2; }
+-.cover-3 { background: #d6e3e7; }
+-.event-info { padding: 22px; }
+-.event-info small { color: #9a573d; font-size: 11px; }
+-.event-info h3 { font-size: 20px; line-height: 1.25; margin: 12px 0; }
+-.event-info p { font-size: 13px; color: #69786d; }
+-.event-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
++.search-panel {
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
++  border-radius: 16px;
++  box-shadow: var(--shadow-lg);
++  padding: 20px;
++  display: grid;
++  grid-template-columns: 2fr 1.2fr 1.1fr 1.1fr;
++  gap: 12px;
++  margin-top: -65px;
++  position: relative;
++  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
++}
++.section-title {
++  display: flex;
++  align-items: end;
++  justify-content: space-between;
++  margin: 50px 0 24px;
++}
++.section-title h2 {
++  font-size: 30px;
++  letter-spacing: -1px;
++  margin-bottom: 0;
++  color: var(--text-primary);
++}
++.section-title span {
++  font-size: 12px;
++  color: var(--text-tertiary);
++}
++.event-grid {
++  display: grid;
++  grid-template-columns: repeat(3, 1fr);
++  gap: 24px;
++}
++.event-card {
++  display: block;
++  border: 1px solid var(--border-color);
++  background: var(--bg-primary);
++  border-radius: 14px;
++  overflow: hidden;
++  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
++}
++.event-card:hover {
++  transform: translateY(-4px);
++  box-shadow: var(--shadow-lg);
++  border-color: var(--brand);
++}
++.event-cover {
++  height: 180px;
++  background: var(--bg-tertiary);
++  padding: 16px;
++  position: relative;
++  overflow: hidden;
++}
++.event-cover span {
++  background: rgba(80, 56, 185, 0.9);
++  color: white;
++  border-radius: 20px;
++  padding: 6px 12px;
++  font-size: 10px;
++  font-weight: 600;
++  position: relative;
++  z-index: 1;
++  display: inline-block;
++}
++.event-cover strong {
++  position: absolute;
++  right: 25px;
++  top: 6px;
++  font: 140px Georgia, serif;
++  color: rgba(79, 56, 185, 0.1);
++  transform: rotate(-12deg);
++}
++.cover-1 { background: linear-gradient(135deg, #f3e8ff, #fecaca); }
++.cover-2 { background: linear-gradient(135deg, #fce7f3, #dbeafe); }
++.cover-3 { background: linear-gradient(135deg, #fed7aa, #c7d2fe); }
++.event-info {
++  padding: 22px;
++}
++.event-info small {
++  color: var(--brand);
++  font-size: 11px;
++  font-weight: 600;
++}
++.event-info h3 {
++  font-size: 18px;
++  line-height: 1.4;
++  margin: 12px 0;
++  color: var(--text-primary);
++}
++.event-info p {
++  font-size: 13px;
++  color: var(--text-tertiary);
++}
++.event-bottom {
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  margin-top: 16px;
++  gap: 8px;
++}
+ .reason { font-size: 11px !important; line-height: 1.5; }
+-.pagination { display: flex; justify-content: center; margin-top: 30px; gap: 20px; }
+-.empty { text-align: center; padding: 65px 20px; color: #67786c; background: #f0f2e9; border-radius: 14px; }
+-.empty h3 { font-size: 23px; }
+-.surface { background: white; border: 1px solid #dde1d5; border-radius: 14px; padding: 28px; margin: 24px 0; }
+-.form-stack { display: flex; flex-direction: column; gap: 18px; }
+-.page-heading { font-size: clamp(32px, 4vw, 48px); line-height: 1.1; letter-spacing: -1.6px; margin-bottom: 22px; }
+-.error { background: #f9e5e1; color: #8e2f20; border-radius: 8px; margin: 20px 0; }
+-.success { background: #e1efdf; color: #245444; border-radius: 8px; margin: 20px 0; }
+-.muted { color: #6e7b71; font-size: 12px; line-height: 1.7; margin-top: 18px; }
+-
+-.auth-page { display: grid; grid-template-columns: 1fr 1fr; min-height: 700px; }
+-.auth-aside { background: #245444; color: #f9f6e9; padding: 80px 12%; position: relative; overflow: hidden; }
+-.auth-aside .eyebrow { color: #d1dcc3; }
+-.auth-aside h1 { font-size: 42px; line-height: 1.15; letter-spacing: -1.5px; margin-top: 75px; }
+-.auth-aside p { color: #d1dcc3; font-size: 16px; line-height: 1.8; }
+-.auth-flower { position: absolute; font-size: 250px; color: #dd9d6e; bottom: -90px; right: 30px; }
+-.auth-content { max-width: 520px; width: 100%; padding: 65px 45px; margin: auto; }
+-.auth-content h2 { font-size: 34px; letter-spacing: -1px; }
+-.auth-content > p { color: #69786d; font-size: 14px; line-height: 1.6; }
+-
+-.detail-top { display: grid; grid-template-columns: 1fr 340px; gap: 45px; margin-top: 35px; }
+-.detail-description { line-height: 1.9; font-size: 16px; white-space: pre-line; margin-top: 25px; }
+-.booking { align-self: start; position: sticky; top: 110px; }
+-.booking h2 { font-size: 32px; margin-top: 15px; }
+-.back-link { font-size: 13px; }
+-.review { border-top: 1px solid #e2e4dd; padding-top: 20px; margin-top: 20px; }
+-.review p { white-space: pre-line; }
+-.reviews { max-width: 760px; }
+-.personal-list { max-width: 850px; }
+-.personal-list .q-btn { margin: 15px; }
+-
+-.footer { border-top: 1px solid #dedfd5; max-width: 1190px; margin: auto; padding: 30px 24px; display: flex; justify-content: space-between; align-items: center; gap: 20px; font-size: 11px; color: #6a786d; }
+-.mobile-links { padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 20px; }
+-.q-btn { border-radius: 8px; letter-spacing: 0; }
+-.q-field--outlined .q-field__control { border-radius: 9px; }
+-.q-banner .q-btn { margin-left: 8px; }
++.pagination {
++  display: flex;
++  justify-content: center;
++  margin-top: 30px;
++  gap: 20px;
++}
++.empty {
++  text-align: center;
++  padding: 65px 20px;
++  color: var(--text-secondary);
++  background: var(--bg-tertiary);
++  border-radius: 14px;
++  border: 1px solid var(--border-color);
++}
++.empty h3 {
++  font-size: 23px;
++  color: var(--text-primary);
++}
++.surface {
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
++  border-radius: 14px;
++  padding: 28px;
++  margin: 24px 0;
++  transition: background-color 0.3s ease, border-color 0.3s ease;
++}
++.form-stack {
++  display: flex;
++  flex-direction: column;
++  gap: 18px;
++}
++.page-heading {
++  font-size: clamp(32px, 4vw, 48px);
++  line-height: 1.1;
++  letter-spacing: -1.6px;
++  margin-bottom: 22px;
++  color: var(--text-primary);
++}
++.error {
++  background: rgba(239, 68, 68, 0.1);
++  color: var(--danger);
++  border-radius: 8px;
++  margin: 20px 0;
++  padding: 14px 16px;
++  border: 1px solid var(--danger);
++}
++.success {
++  background: rgba(16, 185, 129, 0.1);
++  color: var(--success);
++  border-radius: 8px;
++  margin: 20px 0;
++  padding: 14px 16px;
++  border: 1px solid var(--success);
++}
++.muted {
++  color: var(--text-tertiary);
++  font-size: 12px;
++  line-height: 1.7;
++  margin-top: 18px;
++}
++
++.auth-page {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  min-height: 700px;
++  background: var(--bg-primary);
++}
++.auth-aside {
++  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
++  color: white;
++  padding: 80px 12%;
++  position: relative;
++  overflow: hidden;
++}
++.auth-aside .eyebrow {
++  color: rgba(255, 255, 255, 0.8);
++}
++.auth-aside h1 {
++  font-size: 42px;
++  line-height: 1.15;
++  letter-spacing: -1.5px;
++  margin-top: 75px;
++  color: white;
++}
++.auth-aside p {
++  color: rgba(255, 255, 255, 0.85);
++  font-size: 16px;
++  line-height: 1.8;
++}
++.auth-flower {
++  position: absolute;
++  font-size: 250px;
++  color: var(--accent);
++  bottom: -90px;
++  right: 30px;
++  opacity: 0.1;
++}
++.auth-content {
++  max-width: 520px;
++  width: 100%;
++  padding: 65px 45px;
++  margin: auto;
++}
++.auth-content h2 {
++  font-size: 34px;
++  letter-spacing: -1px;
++  color: var(--text-primary);
++}
++.auth-content > p {
++  color: var(--text-secondary);
++  font-size: 14px;
++  line-height: 1.6;
++}
++
++.detail-top {
++  display: grid;
++  grid-template-columns: 1fr 340px;
++  gap: 45px;
++  margin-top: 35px;
++}
++.detail-description {
++  line-height: 1.9;
++  font-size: 16px;
++  white-space: pre-line;
++  margin-top: 25px;
++  color: var(--text-secondary);
++}
++.booking {
++  align-self: start;
++  position: sticky;
++  top: 110px;
++}
++.booking h2 {
++  font-size: 32px;
++  margin-top: 15px;
++  color: var(--text-primary);
++}
++.back-link {
++  font-size: 13px;
++  color: var(--text-secondary);
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++}
++.review {
++  border-top: 1px solid var(--border-color);
++  padding-top: 20px;
++  margin-top: 20px;
++}
++.review p {
++  white-space: pre-line;
++}
++.reviews {
++  max-width: 760px;
++}
++.personal-list {
++  max-width: 850px;
++}
++.personal-list .q-btn {
++  margin: 15px;
++}
++
++.footer {
++  border-top: 1px solid var(--border-color);
++  max-width: 1190px;
++  margin: auto;
++  padding: 30px 24px;
++  display: flex;
++  justify-content: space-between;
++  align-items: center;
++  gap: 20px;
++  font-size: 11px;
++  color: var(--text-tertiary);
++  transition: border-color 0.3s ease, color 0.3s ease;
++}
++.mobile-links {
++  padding: 16px 24px;
++  display: flex;
++  flex-wrap: wrap;
++  gap: 20px;
++}
++.q-btn {
++  border-radius: 8px;
++  letter-spacing: 0;
++}
++.q-field--outlined .q-field__control {
++  border-radius: 9px;
++  border-color: var(--border-color) !important;
++  background: var(--bg-primary) !important;
++  color: var(--text-primary) !important;
++}
++.q-banner .q-btn {
++  margin-left: 8px;
++}
++
++/* Quick filters */
++.quick-filters {
++  display: flex;
++  gap: 12px;
++  margin-top: 24px;
++  align-items: center;
++  flex-wrap: wrap;
++}
++
++.quick-select {
++  flex: 0 1 160px;
++}
++
++.search-btn {
++  border-radius: 999px;
++  padding: 10px 24px;
++  font-weight: 700;
++  min-height: 44px;
++}
++
++/* Event Detail - Immersive Header */
++.event-detail-page {
++  padding: 0;
++}
++
++.immersive-header {
++  position: relative;
++  height: 280px;
++  background-size: cover;
++  background-position: center;
++  background-repeat: no-repeat;
++  display: flex;
++  align-items: flex-start;
++  padding: 20px 0;
++}
++
++.header-gradient {
++  position: absolute;
++  inset: 0;
++  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
++  pointer-events: none;
++}
++
++.header-content {
++  position: relative;
++  z-index: 10;
++  width: 100%;
++  max-width: 1240px;
++  margin: 0 auto;
++  padding: 0 24px;
++  display: flex;
++  align-items: center;
++}
++
++.back-link-immersive {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  width: 44px;
++  height: 44px;
++  background: rgba(255, 255, 255, 0.95);
++  border-radius: 50%;
++  color: var(--text-primary);
++  transition: background-color 0.2s ease, transform 0.2s ease;
++}
++
++.back-link-immersive:hover {
++  background: white;
++  transform: translateX(-4px);
++}
++
++.back-link-immersive :deep(.q-icon) {
++  color: var(--text-primary) !important;
++}
++
++/* Responsive booking module */
++.booking {
++  transition: position 0.3s ease;
++}
++
++@supports (bottom: env(safe-area-inset-bottom)) {
++  .booking-mobile-fixed {
++    position: fixed;
++    bottom: env(safe-area-inset-bottom, 0);
++    left: 0;
++    right: 0;
++    z-index: 100;
++    background: var(--bg-primary);
++    border-top: 1px solid var(--border-color);
++    padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0));
++    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
++  }
++}
+ 
+ @media (max-width: 960px) {
+   .hero-art { margin-left: -10px; transform: scale(.8); transform-origin: left top; }
+@@ -109,29 +629,112 @@ a:focus-visible { outline: 3px solid #d97142; outline-offset: 4px; }
+ }
+ 
+ @media (max-width: 640px) {
+-  .toolbar { gap: 4px; min-height: 72px; }
+-  .brand { font-size: 19px; }
+-  .brand-mark { width: 32px; height: 32px; font-size: 24px; }
+-  .desktop-nav { display: none; }
+-  .mobile-menu { display: block; }
+-  .toolbar > .q-btn { font-size: 12px; padding: 5px 8px; }
+-  .hero { padding: 40px 22px 75px; min-height: auto; }
+-  .hero-copy { min-width: 100%; }
+-  .hero h1 { font-size: 38px; }
+-  .hero-art { display: none; }
+-  .container { padding: 30px 18px 45px; }
+-  .search-panel { grid-template-columns: 1fr; margin-top: -60px; }
+-  .search-panel .q-field { width: 100%; }
+-  .event-grid { grid-template-columns: 1fr; }
+-  .section-title { margin-top: 35px; }
+-  .auth-page { display: block; }
+-  .auth-aside { padding: 30px 24px; min-height: 180px; }
+-  .auth-aside h1 { font-size: 27px; margin-top: 20px; }
+-  .auth-aside p, .auth-flower { display: none; }
+-  .auth-content { padding: 35px 24px; }
+-  .detail-top { grid-template-columns: 1fr; gap: 0; }
+-  .booking { position: static; }
+-  .surface { padding: 22px; }
+-  .footer { display: block; }
+-  .footer > span { display: block; margin-bottom: 15px; }
++  .toolbar {
++    gap: 4px;
++    min-height: 72px;
++    padding: 0 16px;
++  }
++  .brand {
++    font-size: 19px;
++  }
++  .brand-mark {
++    width: 32px;
++    height: 32px;
++    font-size: 24px;
++  }
++  .desktop-nav {
++    display: none;
++  }
++  .mobile-menu {
++    display: block;
++  }
++  .toolbar > .q-btn {
++    font-size: 12px;
++    padding: 5px 8px;
++  }
++  .hero {
++    padding: 40px 22px 75px;
++    min-height: auto;
++  }
++  .hero-copy {
++    min-width: 100%;
++  }
++  .hero h1 {
++    font-size: 36px;
++  }
++  .hero-art {
++    display: none;
++  }
++  .container {
++    padding: 30px 16px 45px;
++  }
++  .search-panel {
++    grid-template-columns: 1fr;
++    margin-top: -60px;
++    padding: 16px;
++  }
++  .search-panel .q-field {
++    width: 100%;
++  }
++  .search-btn {
++    width: 100%;
++  }
++  .quick-filters {
++    flex-direction: column;
++    align-items: stretch;
++  }
++  .quick-filters .q-btn,
++  .quick-select {
++    flex: 1;
++  }
++  .event-grid {
++    grid-template-columns: 1fr;
++  }
++  .section-title {
++    margin-top: 35px;
++  }
++  .auth-page {
++    display: block;
++  }
++  .auth-aside {
++    padding: 30px 24px;
++    min-height: 180px;
++  }
++  .auth-aside h1 {
++    font-size: 27px;
++    margin-top: 20px;
++  }
++  .auth-aside p, .auth-flower {
++    display: none;
++  }
++  .auth-content {
++    padding: 35px 24px;
++  }
++  .detail-top {
++    grid-template-columns: 1fr;
++    gap: 0;
++    margin-bottom: 120px;
++  }
++  .booking {
++    position: static;
++    margin-top: 24px;
++  }
++  .immersive-header {
++    height: 240px;
++    margin-bottom: 0;
++  }
++  .surface {
++    padding: 20px;
++    margin: 20px 0;
++  }
++  .footer {
++    display: block;
++  }
++  .footer > span {
++    display: block;
++    margin-bottom: 15px;
++  }
++  .event-cover {
++    height: 160px;
++  }
+ }
+\ No newline at end of file
+diff --git a/src/assets/styles/ui-system.css b/src/assets/styles/ui-system.css
+new file mode 100644
+index 0000000..1ac6679
+--- /dev/null
++++ b/src/assets/styles/ui-system.css
+@@ -0,0 +1,504 @@
++/* UI System: Shared component styles and modern design patterns.
++   Import this AFTER style.css and experience.css in main.js.
++   Color palette uses CSS variables: --bg-primary, --text-primary, --brand, etc.
++   Supports both light and dark modes automatically.
++*/
++
++/* ---- Refined Input Fields ---- */
++.q-field--outlined .q-field__control {
++  border-radius: 10px;
++  background: var(--bg-primary) !important;
++  color: var(--text-primary) !important;
++  border-color: var(--border-color) !important;
++}
++
++.q-field--outlined.q-field--focused .q-field__control {
++  border-color: var(--brand) !important;
++  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 20%, transparent) !important;
++}
++
++/* ---- Buttons: Modern rounded style ---- */
++.q-btn {
++  border-radius: 10px;
++  font-weight: 600;
++  letter-spacing: 0;
++  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
++}
++
++.q-btn--primary:not(.q-btn--flat):not(.q-btn--disable):not(.q-btn--loading) {
++  background: var(--brand) !important;
++  color: white !important;
++  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 30%, transparent);
++}
++
++.q-btn--primary:not(.q-btn--flat):not(.q-btn--disable):hover {
++  transform: translateY(-1px);
++  box-shadow: 0 6px 20px color-mix(in srgb, var(--brand) 40%, transparent);
++}
++
++.q-btn--primary:not(.q-btn--flat):not(.q-btn--disable):active {
++  transform: translateY(0);
++}
++
++.q-btn.rounded-full {
++  border-radius: 999px;
++}
++
++/* ---- Typography Utility ---- */
++.text-eyebrow {
++  font-size: 11px;
++  font-weight: 700;
++  letter-spacing: 1px;
++  text-transform: uppercase;
++  color: var(--brand);
++}
++
++.text-muted {
++  color: var(--text-secondary);
++}
++
++/* ---- Surfaces and Cards ---- */
++.surface-elevated {
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
++  border-radius: 16px;
++  box-shadow: 0 1px 3px color-mix(in srgb, var(--text-primary) 5%, transparent);
++}
++
++.surface-elevated:hover {
++  box-shadow: 0 4px 12px color-mix(in srgb, var(--text-primary) 8%, transparent);
++  border-color: var(--brand);
++}
++
++/* ---- Status Badges: Soft, modern pill style ---- */
++.badge {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++  padding: 6px 12px;
++  border-radius: 999px;
++  font-size: 12px;
++  font-weight: 700;
++  white-space: nowrap;
++}
++
++.badge-dot {
++  width: 6px;
++  height: 6px;
++  border-radius: 50%;
++  background: currentColor;
++}
++
++.badge-success {
++  background: color-mix(in srgb, var(--success) 15%, transparent);
++  color: var(--success);
++}
++
++.badge-warning {
++  background: color-mix(in srgb, var(--warning) 15%, transparent);
++  color: var(--warning);
++}
++
++.badge-danger {
++  background: color-mix(in srgb, var(--danger) 15%, transparent);
++  color: var(--danger);
++}
++
++.badge-info {
++  background: color-mix(in srgb, var(--brand) 15%, transparent);
++  color: var(--brand);
++}
++
++/* ---- Responsive Grid ---- */
++.grid-auto-fit {
++  display: grid;
++  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
++  gap: 20px;
++}
++
++@media (max-width: 640px) {
++  .grid-auto-fit {
++    grid-template-columns: 1fr;
++  }
++}
++
++/* ---- Empty State ---- */
++.empty-state {
++  text-align: center;
++  padding: 48px 24px;
++  background: var(--bg-secondary);
++  border-radius: 14px;
++  border: 1px solid var(--border-color);
++}
++
++.empty-state__icon {
++  font-size: 48px;
++  color: var(--text-secondary);
++  margin-bottom: 12px;
++}
++
++.empty-state__title {
++  font-size: 18px;
++  font-weight: 600;
++  color: var(--text-primary);
++  margin-bottom: 6px;
++}
++
++.empty-state__description {
++  font-size: 14px;
++  color: var(--text-secondary);
++  margin-bottom: 20px;
++}
++
++/* ---- Loading Spinner ---- */
++.spinner-wrapper {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  gap: 12px;
++  padding: 40px 20px;
++  color: var(--text-secondary);
++}
++
++/* ---- Divider ---- */
++.divider {
++  height: 1px;
++  background: var(--border-color);
++  margin: 20px 0;
++}
++
++.divider-label {
++  display: flex;
++  align-items: center;
++  gap: 12px;
++  color: var(--text-secondary);
++  font-size: 13px;
++  margin: 20px 0;
++}
++
++.divider-label::before,
++.divider-label::after {
++  content: '';
++  flex: 1;
++  height: 1px;
++  background: var(--border-color);
++}
++
++/* ---- Utility: Respect motion preferences ---- */
++@media (prefers-reduced-motion: reduce) {
++  * {
++    animation-duration: 0.01ms !important;
++    animation-iteration-count: 1 !important;
++    transition-duration: 0.01ms !important;
++  }
++}
++
++/* ---- Focus visible for accessibility ---- */
++.q-btn:focus-visible,
++.q-field:focus-visible,
++a:focus-visible,
++button:focus-visible {
++  outline: 2px solid var(--brand);
++  outline-offset: 2px;
++}
++
++/* ---- Utility classes for spacing ---- */
++.gap-sm { gap: 8px; }
++.gap-md { gap: 16px; }
++.gap-lg { gap: 24px; }
++
++.p-sm { padding: 8px; }
++.p-md { padding: 16px; }
++.p-lg { padding: 24px; }
++
++.m-auto { margin: auto; }
++
++/* ---- Stacked form layout ---- */
++.form-vertical {
++  display: flex;
++  flex-direction: column;
++  gap: 16px;
++}
++
++.form-horizontal {
++  display: grid;
++  grid-template-columns: 1fr 1fr;
++  gap: 16px;
++}
++
++@media (max-width: 640px) {
++  .form-horizontal {
++    grid-template-columns: 1fr;
++  }
++}
++
++/* ---- Header pill navigation ---- */
++.nav-pills {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 8px;
++  align-items: center;
++  background: var(--bg-secondary);
++  border: 1px solid var(--border-color);
++  padding: 6px;
++  border-radius: 999px;
++}
++
++.nav-pill {
++  padding: 8px 16px;
++  border-radius: 999px;
++  background: transparent;
++  color: var(--text-secondary);
++  border: none;
++  cursor: pointer;
++  font-weight: 600;
++  font-size: 13.5px;
++  transition: all 0.2s ease;
++}
++
++.nav-pill:hover {
++  color: var(--text-primary);
++}
++
++.nav-pill--active {
++  background: var(--bg-primary);
++  color: var(--brand);
++  box-shadow: 0 2px 8px color-mix(in srgb, var(--text-primary) 8%, transparent);
++}
++
++/* ---- Tables responsive ---- */
++.q-table {
++  background: var(--bg-primary);
++  color: var(--text-primary);
++}
++
++.q-table thead th {
++  background: var(--bg-secondary);
++  color: var(--text-primary);
++  font-weight: 700;
++  border-color: var(--border-color);
++}
++
++.q-table tbody tr {
++  border-color: var(--border-color);
++  transition: background-color 0.15s ease;
++}
++
++.q-table tbody tr:hover {
++  background: color-mix(in srgb, var(--brand) 5%, transparent);
++}
++
++.q-table td {
++  color: var(--text-primary);
++}
++
++/* ---- Dialog/Modal backdrop ---- */
++.q-dialog__backdrop {
++  background: rgba(0, 0, 0, 0.5);
++}
++
++.q-card {
++  background: var(--bg-primary);
++  color: var(--text-primary);
++  border-color: var(--border-color);
++}
++
++/* ---- Select/Dropdown ---- */
++.q-menu {
++  background: var(--bg-primary);
++  box-shadow: 0 10px 40px color-mix(in srgb, var(--text-primary) 15%, transparent);
++}
++
++.q-item {
++  color: var(--text-primary);
++}
++
++.q-item:hover {
++  background: color-mix(in srgb, var(--brand) 8%, transparent);
++}
++
++/* ---- Banner/Alert ---- */
++.q-banner {
++  background: var(--bg-secondary);
++  border-radius: 10px;
++  border: 1px solid var(--border-color);
++  color: var(--text-primary);
++}
++
++.q-banner.error {
++  background: color-mix(in srgb, var(--danger) 15%, transparent);
++  border-color: var(--danger);
++  color: var(--danger);
++}
++
++.q-banner.success {
++  background: color-mix(in srgb, var(--success) 15%, transparent);
++  border-color: var(--success);
++  color: var(--success);
++}
++
++.q-banner.warning {
++  background: color-mix(in srgb, var(--warning) 15%, transparent);
++  border-color: var(--warning);
++  color: var(--warning);
++}
++
++/* ---- Spinner/Loading ---- */
++.q-spinner {
++  color: var(--brand);
++}
++
++/* ---- Transitions ---- */
++.fade-enter-active,
++.fade-leave-active {
++  transition: opacity 0.3s ease;
++}
++
++.fade-enter-from,
++.fade-leave-to {
++  opacity: 0;
++}
++
++.slide-up-enter-active,
++.slide-up-leave-active {
++  transition: transform 0.3s ease, opacity 0.3s ease;
++}
++
++.slide-up-enter-from,
++.slide-up-leave-to {
++  transform: translateY(20px);
++  opacity: 0;
++}
++
++/* ---- Encabezado en modo oscuro (experience.css lo fija en blanco) ---- */
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) .topbar {
++    background: #15131f;
++    color: var(--text-primary);
++    border-color: var(--border-color);
++  }
++  :root:not([data-theme="light"]) .brand-peru { color: #e8b264; }
++  :root:not([data-theme="light"]) .brand small { border-color: var(--border-color); }
++  :root:not([data-theme="light"]) .desktop-nav a,
++  :root:not([data-theme="light"]) .mobile-links a { color: #d9d0ff; }
++  :root:not([data-theme="light"]) .desktop-nav a.nav-pill-active,
++  :root:not([data-theme="light"]) .mobile-links a.nav-pill-active {
++    background: rgba(124, 92, 245, 0.28);
++    color: #ffffff;
++    box-shadow: none;
++  }
++  :root:not([data-theme="light"]) .mobile-links { background: #15131f; }
++}
++
++:root[data-theme="dark"] .topbar {
++  background: #15131f;
++  color: var(--text-primary);
++  border-color: var(--border-color);
++}
++:root[data-theme="dark"] .brand-peru { color: #e8b264; }
++:root[data-theme="dark"] .brand small { border-color: var(--border-color); }
++:root[data-theme="dark"] .desktop-nav a,
++:root[data-theme="dark"] .mobile-links a { color: #d9d0ff; }
++:root[data-theme="dark"] .desktop-nav a.nav-pill-active,
++:root[data-theme="dark"] .mobile-links a.nav-pill-active {
++  background: rgba(124, 92, 245, 0.28);
++  color: #ffffff;
++  box-shadow: none;
++}
++:root[data-theme="dark"] .mobile-links { background: #15131f; }
++
++/* ---- Tarjetas .surface en modo oscuro: separarlas del fondo ---- */
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) .surface,
++  :root:not([data-theme="light"]) .empty {
++    background: var(--bg-secondary);
++    border-color: var(--border-color);
++  }
++}
++:root[data-theme="dark"] .surface,
++:root[data-theme="dark"] .empty {
++  background: var(--bg-secondary);
++  border-color: var(--border-color);
++}
++
++/* ---- Login/registro y botón de usuario activo en modo oscuro ---- */
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) .q-page.auth-page,
++  :root:not([data-theme="light"]) .auth-page {
++    background: var(--bg-primary);
++  }
++  :root:not([data-theme="light"]) .topbar .q-btn.nav-pill-active {
++    background: rgba(124, 92, 245, 0.28);
++    color: #ffffff;
++    box-shadow: none;
++  }
++}
++:root[data-theme="dark"] .q-page.auth-page,
++:root[data-theme="dark"] .auth-page {
++  background: var(--bg-primary);
++}
++:root[data-theme="dark"] .topbar .q-btn.nav-pill-active {
++  background: rgba(124, 92, 245, 0.28);
++  color: #ffffff;
++  box-shadow: none;
++}
++
++/* ---- Pestañas de los paneles (admin/organizador) en modo oscuro ---- */
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) .panel-page .q-tab:not(.q-tab--active) {
++    background: var(--bg-secondary);
++    color: #d9d0ff;
++    box-shadow: inset 0 0 0 1px var(--border-color);
++  }
++}
++:root[data-theme="dark"] .panel-page .q-tab:not(.q-tab--active) {
++  background: var(--bg-secondary);
++  color: #d9d0ff;
++  box-shadow: inset 0 0 0 1px var(--border-color);
++}
++
++/* ---- Tanda 3: acento de compra y escala tipográfica ----
++   --buy es el color SÓLO para comprar y precios destacados. El violeta (--brand) queda como marca.
++   Contraste medido: claro #d63c2f con texto blanco 4.62:1, oscuro #ff7a66 con texto #1a0f0d 7.36:1. */
++:root {
++  --buy: #d63c2f;
++  --buy-hover: #b93226;
++  --buy-text: #ffffff;
++  --fs-card-title: 17px;
++  --fs-card-meta: 13px;
++  --fs-price: 16px;
++  --fs-section: 24px;
++}
++
++@media (prefers-color-scheme: dark) {
++  :root:not([data-theme="light"]) {
++    --buy: #ff7a66;
++    --buy-hover: #ff9580;
++    --buy-text: #1a0f0d;
++  }
++}
++
++:root[data-theme="dark"] {
++  --buy: #ff7a66;
++  --buy-hover: #ff9580;
++  --buy-text: #1a0f0d;
++}
++
++.btn-buy.q-btn {
++  background: var(--buy) !important;
++  color: var(--buy-text) !important;
++  font-weight: 800;
++  letter-spacing: 0.01em;
++  box-shadow: 0 10px 22px -12px var(--buy);
++}
++
++.btn-buy.q-btn:hover {
++  background: var(--buy-hover) !important;
++}
++
++.btn-buy.q-btn.disabled,
++.btn-buy.q-btn[disabled] {
++  background: var(--border-color) !important;
++  color: var(--text-secondary) !important;
++  box-shadow: none;
++}
+diff --git a/src/components/common/LoadError.vue b/src/components/common/LoadError.vue
+new file mode 100644
+index 0000000..9554e3a
+--- /dev/null
++++ b/src/components/common/LoadError.vue
+@@ -0,0 +1,68 @@
++<script setup>
++// Bloque de error de carga con acciones siempre visibles, para que la web no parezca congelada.
++defineProps({
++  message: { type: String, required: true },
++  busy: { type: Boolean, default: false }
++})
++const emit = defineEmits(['retry'])
++
++function reloadPage() {
++  window.location.reload()
++}
++</script>
++
++<template>
++  <div class="load-error" role="alert">
++    <q-icon name="wifi_off" size="40px" class="load-error__icon" aria-hidden="true" />
++    <p class="load-error__text">{{ message }}</p>
++    <div class="load-error__actions">
++      <q-btn
++        unelevated
++        rounded
++        no-caps
++        color="primary"
++        icon="refresh"
++        label="Reintentar"
++        :loading="busy"
++        @click="emit('retry')"
++      />
++      <q-btn outline rounded no-caps color="primary" label="Actualizar página" @click="reloadPage" />
++    </div>
++  </div>
++</template>
++
++<style scoped>
++.load-error {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  text-align: center;
++  gap: 10px;
++  padding: 36px 20px;
++  margin: 8px 0 24px;
++  border-radius: 22px;
++  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border-color));
++  background: color-mix(in srgb, var(--danger) 7%, var(--bg-secondary));
++}
++
++.load-error__icon {
++  color: color-mix(in srgb, var(--danger) 70%, var(--text-primary));
++}
++
++.load-error__text {
++  margin: 0;
++  max-width: 460px;
++  font-size: 16px;
++  font-weight: 600;
++  line-height: 1.45;
++  color: var(--text-primary);
++}
++
++.load-error__actions {
++  display: flex;
++  flex-wrap: wrap;
++  justify-content: center;
++  gap: 10px;
++  margin-top: 4px;
++}
++</style>
+diff --git a/src/components/events/EventCard.vue b/src/components/events/EventCard.vue
+index 94feb04..ddc27ff 100644
+--- a/src/components/events/EventCard.vue
++++ b/src/components/events/EventCard.vue
+@@ -1,6 +1,6 @@
+ <script setup>
+-import { ref, watch } from 'vue'
+-import { date, money } from '@/utils/formatters'
++import { ref, watch, computed } from 'vue'
++import { money, shortDate } from '@/utils/formatters'
+ 
+ const props = defineProps({
+   event: {
+@@ -15,47 +15,271 @@ const props = defineProps({
+ 
+ const imageFailed = ref(false)
+ 
+-watch(() => props.event.imageUrl, () => {
+-  imageFailed.value = false
++const spots = computed(() =>
++  typeof props.event.availableSpots === 'number' ? props.event.availableSpots : null
++)
++
++// Agotado sólo con dato explícito: un campo ausente no marca el evento como agotado
++const isSoldOut = computed(() => props.event.isSoldOut === true || (spots.value !== null && spots.value <= 0))
++
++// Últimas entradas: quedan 5 o menos, o el 10 % del aforo si el aforo es grande
++const hasLimitedTickets = computed(() => {
++  if (isSoldOut.value || spots.value === null) return false
++  const capacity = Number(props.event.capacity) || 0
++  const limit = Math.max(5, Math.ceil(capacity * 0.1))
++  return spots.value > 0 && spots.value <= limit
+ })
++
++const priceLabel = computed(() => {
++  const price = Number(props.event.price)
++  if (!price) return 'Gratis'
++  return 'desde ' + money(price, props.event.currency || 'PEN')
++})
++
++const place = computed(() =>
++  [props.event.venue || props.event.address, props.event.city].filter(Boolean).join(' · ')
++)
++
++watch(
++  () => props.event.imageUrl,
++  () => {
++    imageFailed.value = false
++  }
++)
+ </script>
+ 
+ <template>
+-  <router-link :to="'/evento/' + event.id" class="event-card">
+-    <div class="event-cover" :class="'cover-' + (index % 4)">
++  <router-link :to="'/evento/' + event.id" class="event-card ui-card">
++    <div class="event-cover ui-cover" :class="'cover-' + (index % 4)">
+       <img
+         v-if="event.imageUrl && !imageFailed"
+         :key="event.imageUrl"
+         :src="event.imageUrl"
+-        alt=""
++        :alt="'Imagen de ' + event.name"
+         loading="lazy"
++        decoding="async"
+         @error="imageFailed = true"
+       />
+-      <strong v-else aria-hidden="true">{{ event.name.slice(0, 1) }}</strong>
+-      <span>{{ event.category }}</span>
++      <strong v-else class="ui-cover-initial" aria-hidden="true">{{ (event.name || '?').slice(0, 1) }}</strong>
++      <div class="ui-cover-shade" aria-hidden="true"></div>
++      <div class="ui-cover-badges">
++        <span v-if="event.category" class="ui-tag ui-tag--category">{{ event.category }}</span>
++        <span v-if="isSoldOut" class="ui-tag ui-tag--soldout">Agotado</span>
++        <span v-else-if="hasLimitedTickets" class="ui-tag ui-tag--limited">Últimas entradas</span>
++      </div>
+     </div>
+ 
+-    <div class="event-info">
+-      <small>{{ date(event.startDate) }}</small>
+-      <h3>{{ event.name }}</h3>
+-      <p>{{ event.city }} · {{ event.venue || event.address }}</p>
+-
+-      <div class="event-bottom">
+-        <strong>{{ event.price === 0 ? 'Gratis' : money(event.price, event.currency) }}</strong>
+-        <q-badge :color="event.availableSpots > 0 ? 'primary' : 'grey'">
+-          {{ event.availableSpots > 0 ? 'Ver evento' : 'Agotado' }}
+-        </q-badge>
++    <div class="event-info ui-card-body">
++      <small class="ui-card-date">{{ shortDate(event.startDate) }}</small>
++      <h3 class="ui-card-title">{{ event.name }}</h3>
++      <p v-if="place" class="ui-card-place">
++        <q-icon name="place" size="16px" aria-hidden="true" />
++        <span>{{ place }}</span>
++      </p>
++      <div class="event-bottom ui-card-bottom">
++        <strong class="ui-card-price" :class="{ 'is-free': priceLabel === 'Gratis' }">{{ priceLabel }}</strong>
++        <q-icon name="arrow_forward" size="18px" class="ui-card-arrow" aria-hidden="true" />
+       </div>
+     </div>
+   </router-link>
+ </template>
+ 
+ <style scoped>
+-.event-cover img {
++.ui-card {
++  display: flex;
++  flex-direction: column;
++  overflow: hidden;
++  border-radius: 20px;
++  background: var(--bg-secondary);
++  border: 1px solid var(--border-color);
++  color: var(--text-primary);
++  text-decoration: none;
++  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
++}
++
++.ui-card:hover,
++.ui-card:focus-visible {
++  transform: translateY(-4px);
++  border-color: var(--brand);
++  box-shadow: 0 14px 32px -14px rgba(20, 10, 60, 0.45);
++}
++
++.ui-card:active {
++  transform: translateY(-1px) scale(0.99);
++}
++
++.ui-cover {
++  position: relative;
++  aspect-ratio: 4 / 3;
++  min-height: 0;
++  overflow: hidden;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++}
++
++.ui-cover {
++  background: linear-gradient(135deg, #2e2170, #7c5cf5);
++}
++
++.ui-cover.cover-1 {
++  background: linear-gradient(135deg, #7d2450, #e0567a);
++}
++
++.ui-cover.cover-2 {
++  background: linear-gradient(135deg, #0d5444, #24a37f);
++}
++
++.ui-cover.cover-3 {
++  background: linear-gradient(135deg, #6e420f, #e0a53c);
++}
++
++.ui-cover img {
+   position: absolute;
+   inset: 0;
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
++  transition: transform 0.4s ease;
++}
++
++.ui-card:hover .ui-cover img {
++  transform: scale(1.04);
++}
++
++.ui-cover-initial {
++  position: relative;
++  font-size: 64px;
++  font-weight: 800;
++  color: rgba(255, 255, 255, 0.9);
++}
++
++.ui-cover-shade {
++  position: absolute;
++  inset: 0;
++  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 40%);
++  pointer-events: none;
++}
++
++.ui-cover-badges {
++  position: absolute;
++  top: 12px;
++  left: 12px;
++  right: 12px;
++  display: flex;
++  justify-content: space-between;
++  align-items: flex-start;
++  gap: 8px;
++  z-index: 2;
++}
++
++.ui-tag {
++  border-radius: 999px;
++  padding: 5px 11px;
++  font-size: 11px;
++  font-weight: 800;
++  letter-spacing: 0.02em;
++  line-height: 1.2;
++  backdrop-filter: blur(6px);
++}
++
++.ui-tag--category {
++  background: rgba(15, 13, 27, 0.72);
++  color: #ffffff;
++}
++
++.ui-tag--limited {
++  background: #ffb020;
++  color: #1a1203;
++  margin-left: auto;
++}
++
++.ui-tag--soldout {
++  background: rgba(240, 240, 245, 0.95);
++  color: #1f1f2e;
++  margin-left: auto;
++}
++
++.ui-card-body {
++  display: flex;
++  flex-direction: column;
++  gap: 6px;
++  padding: 16px 18px 18px;
++  flex: 1;
++}
++
++.ui-card-date {
++  color: var(--brand);
++  font-weight: 800;
++  font-size: var(--fs-card-meta, 13px);
++  letter-spacing: 0.04em;
++  text-transform: uppercase;
++}
++
++.ui-card-title {
++  margin: 0;
++  font-size: var(--fs-card-title, 17px);
++  line-height: 1.25;
++  font-weight: 800;
++  color: var(--text-primary);
++  display: -webkit-box;
++  -webkit-line-clamp: 2;
++  -webkit-box-orient: vertical;
++  overflow: hidden;
++}
++
++.ui-card-place {
++  margin: 0;
++  display: flex;
++  align-items: center;
++  gap: 4px;
++  font-size: var(--fs-card-meta, 13px);
++  color: var(--text-secondary);
++}
++
++.ui-card-place span {
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++}
++
++.ui-card-bottom {
++  margin-top: auto;
++  padding-top: 10px;
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++}
++
++.ui-card-price {
++  font-size: var(--fs-price, 16px);
++  font-weight: 800;
++  color: var(--text-primary);
++}
++
++.ui-card-price.is-free {
++  color: #12a372;
++}
++
++.ui-card-arrow {
++  color: var(--text-secondary);
++  transition: transform 0.2s ease, color 0.2s ease;
++}
++
++.ui-card:hover .ui-card-arrow {
++  transform: translateX(3px);
++  color: var(--brand);
++}
++
++@media (prefers-reduced-motion: reduce) {
++  .ui-card,
++  .ui-cover img,
++  .ui-card-arrow {
++    transition: none;
++  }
++  .ui-card:hover,
++  .ui-card:hover .ui-cover img {
++    transform: none;
++  }
+ }
+-</style>
+\ No newline at end of file
++</style>
+diff --git a/src/components/layout/AppHeader.vue b/src/components/layout/AppHeader.vue
+index 695c4c4..14679e6 100644
+--- a/src/components/layout/AppHeader.vue
++++ b/src/components/layout/AppHeader.vue
+@@ -1,12 +1,21 @@
+ <script setup>
+-import { ref } from 'vue'
++import { ref, computed } from 'vue'
+ import { useRoute, useRouter } from 'vue-router'
+ import { session, signOut } from '@/stores/authStore'
++import { THEME_OPTIONS, themeChoice, setTheme } from '@/utils/themeManager'
+ 
+ const route = useRoute()
+ const router = useRouter()
+ const menu = ref(false)
+ 
++const currentTheme = computed(() => themeChoice.value)
++
++const themeIcon = computed(() => {
++  if (currentTheme.value === THEME_OPTIONS.DARK) return 'dark_mode'
++  if (currentTheme.value === THEME_OPTIONS.LIGHT) return 'light_mode'
++  return 'brightness_auto'
++})
++
+ function logout() {
+   menu.value = false
+   signOut()
+@@ -60,6 +69,49 @@ function logout() {
+         </template>
+       </nav>
+ 
++      <!-- SELECTOR DE TEMA -->
++      <div class="theme-selector">
++        <q-btn flat round :icon="themeIcon" aria-label="Cambiar tema" class="theme-btn">
++        <q-menu anchor="bottom right" self="top right" :offset="[0, 8]" auto-close>
++          <q-list style="min-width: 150px">
++            <q-item
++              clickable
++              v-ripple
++              :active="currentTheme === THEME_OPTIONS.SYSTEM"
++              @click="setTheme(THEME_OPTIONS.SYSTEM)"
++            >
++              <q-item-section avatar>
++                <q-icon name="brightness_auto" />
++              </q-item-section>
++              <q-item-section>Sistema</q-item-section>
++            </q-item>
++            <q-item
++              clickable
++              v-ripple
++              :active="currentTheme === THEME_OPTIONS.LIGHT"
++              @click="setTheme(THEME_OPTIONS.LIGHT)"
++            >
++              <q-item-section avatar>
++                <q-icon name="light_mode" />
++              </q-item-section>
++              <q-item-section>Claro</q-item-section>
++            </q-item>
++            <q-item
++              clickable
++              v-ripple
++              :active="currentTheme === THEME_OPTIONS.DARK"
++              @click="setTheme(THEME_OPTIONS.DARK)"
++            >
++              <q-item-section avatar>
++                <q-icon name="dark_mode" />
++              </q-item-section>
++              <q-item-section>Oscuro</q-item-section>
++            </q-item>
++          </q-list>
++        </q-menu>
++        </q-btn>
++      </div>
++
+       <!-- ACCIONES DE CUENTA CON SESIÓN -->
+       <template v-if="session.user">
+         <q-btn
+diff --git a/src/components/organizer/OrganizerEventCard.vue b/src/components/organizer/OrganizerEventCard.vue
+index 0f16114..00a783e 100644
+--- a/src/components/organizer/OrganizerEventCard.vue
++++ b/src/components/organizer/OrganizerEventCard.vue
+@@ -62,7 +62,7 @@ const canCancel = computed(() => {
+         />
+         <div
+           v-else
+-          style="width: 96px; height: 72px; border-radius: 12px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
++          class="event-card-fallback"
+         >
+           <q-icon name="event" size="32px" />
+         </div>
+@@ -161,4 +161,18 @@ const canCancel = computed(() => {
+       />
+     </div>
+   </article>
+-</template>
+\ No newline at end of file
++</template>
++
++<style scoped>
++.event-card-fallback {
++  width: 96px;
++  height: 72px;
++  border-radius: 12px;
++  background: color-mix(in srgb, var(--brand) 15%, transparent);
++  color: var(--brand);
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  flex-shrink: 0;
++}
++</style>
+\ No newline at end of file
+diff --git a/src/components/tickets/TicketCard.vue b/src/components/tickets/TicketCard.vue
+index 4524b23..b2f7f16 100644
+--- a/src/components/tickets/TicketCard.vue
++++ b/src/components/tickets/TicketCard.vue
+@@ -110,8 +110,8 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
+ <style scoped>
+ .ticket-card {
+   display: flex;
+-  background: #fff;
+-  border: 1px solid var(--line);
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
+   border-radius: 18px;
+   overflow: hidden;
+   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+@@ -119,15 +119,15 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
+ 
+ .ticket-card:hover {
+   transform: translateY(-2px);
+-  border-color: #cfc1ed;
+-  box-shadow: 0 12px 26px #231b3c12;
++  border-color: var(--brand);
++  box-shadow: 0 12px 26px color-mix(in srgb, var(--text-primary) 8%, transparent);
+ }
+ 
+ .ticket-card__cover {
+   width: 215px;
+   min-height: 170px;
+   flex-shrink: 0;
+-  background: #ede4ff;
++  background: var(--bg-tertiary);
+ }
+ 
+ .ticket-card__cover img {
+@@ -202,29 +202,30 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
+ }
+ 
+ .ticket-badge--valid {
+-  background: #e1f7ea;
+-  color: #157a44;
++  background: color-mix(in srgb, var(--success) 15%, transparent);
++  color: color-mix(in srgb, var(--success) 50%, var(--text-primary));
+ }
+ 
+ .ticket-badge--used {
+-  background: var(--wash);
+-  color: var(--muted-ink);
++  background: color-mix(in srgb, var(--text-secondary) 10%, transparent);
++  color: var(--text-secondary);
+ }
+ 
+ .ticket-badge--canceled {
+-  background: #f9e5e1;
+-  color: #8e2f20;
++  background: color-mix(in srgb, var(--danger) 15%, transparent);
++  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
+ }
+ 
+ .ticket-card__alert {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+-  background: #f9e5e1;
+-  color: #8e2f20;
++  background: color-mix(in srgb, var(--danger) 15%, transparent);
++  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
+   padding: 8px 12px;
+   border-radius: 10px;
+   font-size: 12.5px;
++  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+ }
+ 
+ .ticket-card__bottom {
+@@ -237,9 +238,9 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
+ }
+ 
+ .ticket-code {
+-  background: var(--wash);
+-  color: var(--ink);
+-  border: 1px solid var(--line);
++  background: var(--bg-secondary);
++  color: var(--text-primary);
++  border: 1px solid var(--border-color);
+   padding: 5px 12px;
+   border-radius: 999px;
+   font-size: 12px;
+@@ -257,20 +258,29 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
+ }
+ 
+ .ticket-card__btn {
+-  background: var(--wash);
++  background: color-mix(in srgb, var(--brand) 15%, transparent);
+   color: var(--brand);
+   border-radius: 999px;
+   padding: 6px 16px;
+   font-weight: 700;
++  transition: all 0.2s ease;
++}
++
++.ticket-card__btn:hover {
++  background: color-mix(in srgb, var(--brand) 25%, transparent);
+ }
+ 
+-/* [AGREGADO HU-13] Estilo del botón Reseñar evento */
+ .ticket-card__review-btn {
+-  background: #fff4d6;
+-  color: #8a5a00;
++  background: color-mix(in srgb, var(--warning) 15%, transparent);
++  color: color-mix(in srgb, var(--warning) 50%, var(--text-primary));
+   border-radius: 999px;
+   padding: 6px 16px;
+   font-weight: 700;
++  transition: all 0.2s ease;
++}
++
++.ticket-card__review-btn:hover {
++  background: color-mix(in srgb, var(--warning) 25%, transparent);
+ }
+ 
+ @media (max-width: 640px) {
+diff --git a/src/components/tickets/TicketQrModal.vue b/src/components/tickets/TicketQrModal.vue
+index 6c7d250..9c6e2a9 100644
+--- a/src/components/tickets/TicketQrModal.vue
++++ b/src/components/tickets/TicketQrModal.vue
+@@ -266,15 +266,16 @@ async function handleDownload() {
+   width: 100%;
+   border-radius: 24px;
+   overflow: hidden;
+-  background: #ffffff;
+-  box-shadow: 0 24px 60px rgba(15, 12, 41, 0.45);
++  background: var(--bg-primary);
++  box-shadow: 0 24px 60px color-mix(in srgb, var(--text-primary) 20%, transparent);
++  color: var(--text-primary);
+ }
+ 
+ .voucher-ticket__head {
+   position: relative;
+   overflow: hidden;
+-  background: linear-gradient(135deg, #3c289e 0%, #5239c2 100%);
+-  color: #ffffff;
++  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
++  color: white;
+   padding: 24px 26px 22px;
+ }
+ 
+@@ -346,7 +347,7 @@ async function handleDownload() {
+   width: 22px;
+   height: 22px;
+   border-radius: 50%;
+-  background: #171332;
++  background: var(--bg-primary);
+   position: absolute;
+ }
+ 
+@@ -383,21 +384,21 @@ async function handleDownload() {
+ }
+ 
+ .voucher-status--valid {
+-  background: #dcfce7;
+-  color: #15803d;
+-  border: 1px solid #bbf7d0;
++  background: color-mix(in srgb, var(--success) 15%, transparent);
++  color: color-mix(in srgb, var(--success) 50%, var(--text-primary));
++  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+ }
+ 
+ .voucher-status--used {
+-  background: var(--wash);
+-  color: var(--muted-ink);
+-  border: 1px solid var(--line);
++  background: var(--bg-secondary);
++  color: var(--text-secondary);
++  border: 1px solid var(--border-color);
+ }
+ 
+ .voucher-status--canceled {
+-  background: #fee2e2;
+-  color: #b91c1c;
+-  border: 1px solid #fecaca;
++  background: color-mix(in srgb, var(--danger) 15%, transparent);
++  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
++  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+ }
+ 
+ .voucher-ticket__refund {
+@@ -405,9 +406,9 @@ async function handleDownload() {
+   display: flex;
+   align-items: flex-start;
+   gap: 10px;
+-  background: #fef2f2;
+-  border: 1px solid #fecaca;
+-  color: #991b1b;
++  background: color-mix(in srgb, var(--danger) 15%, transparent);
++  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
++  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
+   padding: 10px 14px;
+   border-radius: 14px;
+   font-size: 12.5px;
+@@ -427,10 +428,10 @@ async function handleDownload() {
+ 
+ .voucher-ticket__qr-frame {
+   padding: 14px;
+-  background: #ffffff;
+-  border: 1px solid var(--line);
++  background: var(--bg-secondary);
++  border: 1px solid var(--border-color);
+   border-radius: 22px;
+-  box-shadow: 0 8px 24px rgba(35, 27, 60, 0.06);
++  box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 5%, transparent);
+ }
+ 
+ .voucher-ticket__qr-frame img {
+@@ -439,8 +440,8 @@ async function handleDownload() {
+ 
+ .voucher-ticket__qr-disabled {
+   width: 100%;
+-  background: var(--wash);
+-  border: 1.5px dashed #cfc1ed;
++  background: var(--bg-secondary);
++  border: 1.5px dashed var(--border-color);
+   border-radius: 18px;
+   padding: 24px 16px;
+   text-align: center;
+@@ -448,7 +449,7 @@ async function handleDownload() {
+   flex-direction: column;
+   align-items: center;
+   gap: 6px;
+-  color: var(--muted-ink);
++  color: var(--text-secondary);
+ }
+ 
+ .voucher-ticket__qr-disabled strong {
+@@ -471,8 +472,8 @@ async function handleDownload() {
+ 
+ .voucher-ticket__hint-box {
+   width: 100%;
+-  background: #eef2ff;
+-  border: 1px solid #e0e7ff;
++  background: color-mix(in srgb, var(--brand) 15%, transparent);
++  border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
+   border-radius: 16px;
+   padding: 12px 16px;
+   text-align: center;
+@@ -483,12 +484,12 @@ async function handleDownload() {
+ 
+ .voucher-ticket__hint-box strong {
+   font-size: 13px;
+-  color: #3730a3;
++  color: var(--brand);
+ }
+ 
+ .voucher-ticket__hint-box span {
+   font-size: 12px;
+-  color: var(--brand);
++  color: var(--text-secondary);
+ }
+ 
+ .voucher-ticket__info-grid {
+@@ -499,8 +500,8 @@ async function handleDownload() {
+ }
+ 
+ .voucher-ticket__info-card {
+-  background: #f8f7fc;
+-  border: 1px solid var(--line);
++  background: var(--bg-secondary);
++  border: 1px solid var(--border-color);
+   border-radius: 16px;
+   padding: 12px 14px;
+   text-align: center;
+@@ -511,25 +512,25 @@ async function handleDownload() {
+ 
+ .voucher-ticket__info-card small {
+   font-size: 12px;
+-  color: var(--muted-ink);
++  color: var(--text-secondary);
+ }
+ 
+ .voucher-ticket__info-card strong {
+   font-size: 14px;
+   font-weight: 700;
+-  color: var(--ink);
++  color: var(--text-primary);
+ }
+ 
+ .voucher-ticket__foot {
+-  background: #f8f7fc;
+-  border-top: 1px solid var(--line);
++  background: var(--bg-secondary);
++  border-top: 1px solid var(--border-color);
+   padding: 12px 22px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   gap: 10px;
+   font-size: 11.5px;
+-  color: var(--muted-ink);
++  color: var(--text-secondary);
+ }
+ 
+ .voucher-ticket__foot a {
+diff --git a/src/main.js b/src/main.js
+index 6f488bd..c5cf1a6 100644
+--- a/src/main.js
++++ b/src/main.js
+@@ -6,13 +6,19 @@ import 'quasar/dist/quasar.css'
+ import '@/assets/styles/style.css'
+ import '@/assets/styles/experience.css'
+ import '@/assets/styles/theme-blue.css'
++import '@/assets/styles/ui-system.css'
+ import App from './App.vue'
+ import router from './router'
++import { initializeTheme, quasarDarkSetting } from '@/utils/themeManager'
++
++// Tema antes de montar: evita el destello claro al abrir en modo oscuro
++initializeTheme()
+ 
+ createApp(App)
+   .use(Quasar, {
+     lang: es,
+     config: {
++      dark: quasarDarkSetting(),
+       brand: {
+         primary: '#5038B9',
+         secondary: '#DAA540',
+@@ -21,4 +27,4 @@ createApp(App)
+     }
+   })
+   .use(router)
+-  .mount('#app')
+\ No newline at end of file
++  .mount('#app')
+diff --git a/src/pages/auth/Auth.vue b/src/pages/auth/Auth.vue
+index 714425a..ad001d1 100644
+--- a/src/pages/auth/Auth.vue
++++ b/src/pages/auth/Auth.vue
+@@ -215,7 +215,7 @@ async function submit() {
+ 
+ <style scoped>
+ .auth-google { margin-top: 16px; }
+-.auth-divider { display: flex; align-items: center; gap: 12px; color: #6b6585; font-size: 13px; margin-bottom: 14px; }
+-.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #e3e0ef; }
++.auth-divider { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
++.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+ .auth-google-btn { display: flex; justify-content: center; min-height: 44px; }
+ </style>
+diff --git a/src/pages/organizer/CreateEvent.vue b/src/pages/organizer/CreateEvent.vue
+index 0fcfbf8..629e08d 100644
+--- a/src/pages/organizer/CreateEvent.vue
++++ b/src/pages/organizer/CreateEvent.vue
+@@ -360,12 +360,11 @@ onMounted(init)
+         </div>
+ 
+         <!-- Imagen de portada (Subir archivo a Supabase Storage o pegar URL) -->
+-        <div style="display: grid; gap: 12px; padding: 16px; border: 1px dashed #cbd5e1; border-radius: 14px; background: #f8fafc;">
++        <div style="display: grid; gap: 12px; padding: 16px; border: 1px dashed var(--border-color); border-radius: 14px; background: var(--bg-secondary);">
+           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+             <q-file
+               v-model="imageFile"
+               outlined
+-              bg-color="white"
+               accept="image/*"
+               max-file-size="5242880"
+               label="Subir imagen desde tu dispositivo (máx. 5 MB)"
+@@ -382,7 +381,6 @@ onMounted(init)
+               v-model="form.imagenUrl"
+               outlined
+               clearable
+-              bg-color="white"
+               label="O pega una URL de imagen de portada"
+               placeholder="https://..."
+               :disable="uploadingImage"
+@@ -393,9 +391,9 @@ onMounted(init)
+             <img
+               :src="form.imagenUrl"
+               alt="Vista previa de portada"
+-              style="width: 140px; height: 84px; flex-shrink: 0; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0;"
++              style="width: 140px; height: 84px; flex-shrink: 0; border-radius: 10px; object-fit: cover; border: 1px solid var(--border-color);"
+             />
+-            <div style="font-size: 0.85rem; color: #475569; min-width: 0; overflow-wrap: anywhere;">
++            <div style="font-size: 0.85rem; color: var(--text-secondary); min-width: 0; overflow-wrap: anywhere;">
+               <strong>Portada lista</strong>
+               <div>{{ form.imagenUrl }}</div>
+             </div>
+@@ -403,7 +401,7 @@ onMounted(init)
+         </div>
+ 
+         <!-- Botones de acción -->
+-        <div style="display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-top: 8px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
++        <div style="display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+           <q-btn
+             flat
+             no-caps
+diff --git a/src/pages/organizer/MyEvents.vue b/src/pages/organizer/MyEvents.vue
+index fe326b8..797cd96 100644
+--- a/src/pages/organizer/MyEvents.vue
++++ b/src/pages/organizer/MyEvents.vue
+@@ -134,7 +134,7 @@ onMounted(loadMyEvents)
+     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+       <div class="surface" style="border-radius: 16px; padding: 18px;">
+         <q-icon name="festival" color="primary" size="26px" />
+-        <div style="font-size: 1.7rem; font-weight: 700; color: #4f46e5; margin-top: 8px;">
++        <div class="kpi-value kpi-value--brand">
+           {{ kpis.total }}
+         </div>
+         <div class="muted">Eventos totales</div>
+@@ -142,7 +142,7 @@ onMounted(loadMyEvents)
+ 
+       <div class="surface" style="border-radius: 16px; padding: 18px;">
+         <q-icon name="check_circle" color="positive" size="26px" />
+-        <div style="font-size: 1.7rem; font-weight: 700; color: #16a34a; margin-top: 8px;">
++        <div class="kpi-value kpi-value--success">
+           {{ kpis.published }}
+         </div>
+         <div class="muted">Publicados</div>
+@@ -150,7 +150,7 @@ onMounted(loadMyEvents)
+ 
+       <div class="surface" style="border-radius: 16px; padding: 18px;">
+         <q-icon name="confirmation_number" color="amber-8" size="26px" />
+-        <div style="font-size: 1.7rem; font-weight: 700; color: #4f46e5; margin-top: 8px;">
++        <div class="kpi-value kpi-value--warning">
+           {{ kpis.ticketsSold }}
+         </div>
+         <div class="muted">Entradas vendidas</div>
+@@ -158,7 +158,7 @@ onMounted(loadMyEvents)
+ 
+       <div class="surface" style="border-radius: 16px; padding: 18px;">
+         <q-icon name="payments" color="orange-8" size="26px" />
+-        <div style="font-size: 1.7rem; font-weight: 700; color: #ea580c; margin-top: 8px;">
++        <div class="kpi-value kpi-value--warning">
+           {{ money(kpis.revenue) }}
+         </div>
+         <div class="muted">Ingresos totales</div>
+@@ -235,4 +235,24 @@ onMounted(loadMyEvents)
+       @canceled="handleEventCanceled"
+     />
+   </q-page>
+-</template>
+\ No newline at end of file
++</template>
++
++<style scoped>
++.kpi-value {
++  font-size: 1.7rem;
++  font-weight: 700;
++  margin-top: 8px;
++}
++
++.kpi-value--brand {
++  color: var(--brand);
++}
++
++.kpi-value--success {
++  color: color-mix(in srgb, var(--success) 60%, var(--text-primary));
++}
++
++.kpi-value--warning {
++  color: color-mix(in srgb, var(--warning) 60%, var(--text-primary));
++}
++</style>
+\ No newline at end of file
+diff --git a/src/pages/public/EventDetail.vue b/src/pages/public/EventDetail.vue
+index 6f2a68a..53578f4 100644
+--- a/src/pages/public/EventDetail.vue
++++ b/src/pages/public/EventDetail.vue
+@@ -2,10 +2,11 @@
+ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+ import { useRoute, useRouter } from 'vue-router'
+ import EventCard from '@/components/events/EventCard.vue'
++import LoadError from '@/components/common/LoadError.vue'
+ import { eventService } from '@/services/eventService'
+ import { ticketService } from '@/services/ticketService'
+ import { session } from '@/stores/authStore'
+-import { date, money } from '@/utils/formatters'
++import { date, money, shortDate } from '@/utils/formatters'
+ 
+ const route = useRoute()
+ const router = useRouter()
+@@ -182,21 +183,37 @@ onBeforeUnmount(() => {
+ </script>
+ 
+ <template>
+-  <q-page class="container">
+-    <router-link to="/explorar" class="back-link">← Volver a explorar</router-link>
+-
+-    <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
+-    <div v-if="busy" class="empty"><q-spinner /> Cargando evento…</div>
++  <q-page class="detail-page" :class="{ 'has-buybar': event && !isClosedForSale }">
++    <div v-if="!event" class="container">
++      <router-link to="/explorar" class="back-link">← Volver a explorar</router-link>
++      <LoadError v-if="error && !busy" :message="error" :busy="busy" @retry="load" />
++      <div v-if="busy" class="empty"><q-spinner /> Cargando evento…</div>
++    </div>
+ 
+     <template v-if="event">
+-      <div class="detail-top detail-grid">
+-        <!-- COLUMNA PRINCIPAL IZQUIERDA -->
+-        <div class="detail-main">
+-          <div class="eyebrow">{{ event.category }} · {{ event.city }}</div>
+-          <h1 class="page-heading">{{ event.name }}</h1>
++      <!-- CABECERA INMERSIVA: imagen a todo el ancho con degradado para leer el texto -->
++      <header class="detail-hero" :class="{ 'is-closed': isClosedForSale }">
++        <div
++          class="detail-hero__bg"
++          :style="event.imageUrl ? { backgroundImage: 'url(' + JSON.stringify(event.imageUrl) + ')' } : null"
++          aria-hidden="true"
++        ></div>
++        <div class="detail-hero__shade" aria-hidden="true"></div>
++        <div class="detail-hero__content">
++          <router-link to="/explorar" class="detail-back">
++            <q-icon name="arrow_back" size="18px" aria-hidden="true" /> Explorar
++          </router-link>
++          <div class="detail-hero__eyebrow">{{ [event.category, event.city].filter(Boolean).join(' · ') }}</div>
++          <h1 class="detail-hero__title">{{ event.name }}</h1>
++          <p class="detail-hero__meta">
++            <span><q-icon name="event" size="18px" aria-hidden="true" /> {{ shortDate(event.startDate) }}</span>
++            <span v-if="event.venue || event.address">
++              <q-icon name="place" size="18px" aria-hidden="true" /> {{ event.venue || event.address }}
++            </span>
++          </p>
+ 
+           <!-- Badges de estado y valoración -->
+-          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
++          <div class="detail-badges">
+             <q-badge
+               :color="isCancelled ? 'negative' : isFinished ? 'grey-8' : 'primary'"
+               style="padding: 5px 10px; font-weight: 700;"
+@@ -219,7 +236,14 @@ onBeforeUnmount(() => {
+               ★ {{ Number(summary.averageRating).toFixed(1) }} ({{ summary.totalReviews }})
+             </q-badge>
+           </div>
++        </div>
++      </header>
+ 
++      <div class="container detail-body">
++      <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
++      <div class="detail-top detail-grid">
++        <!-- COLUMNA PRINCIPAL IZQUIERDA -->
++        <div class="detail-main">
+           <p class="detail-description">{{ event.description }}</p>
+ 
+           <!-- Ficha técnica del evento -->
+@@ -382,7 +406,6 @@ onBeforeUnmount(() => {
+                 outlined
+                 type="textarea"
+                 rows="3"
+-                bg-color="white"
+                 label="Cuéntanos qué fue lo que más te gustó (opcional)"
+                 maxlength="1000"
+                 counter
+@@ -498,7 +521,7 @@ onBeforeUnmount(() => {
+               no-caps
+               color="primary"
+               icon="confirmation_number"
+-              class="full-width booking-cta"
++              class="full-width booking-cta btn-buy"
+               :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
+               :disable="isSoldOut"
+               @click="handleBuyAction"
+@@ -520,11 +543,203 @@ onBeforeUnmount(() => {
+           />
+         </div>
+       </section>
++      </div>
++
++      <!-- BARRA DE COMPRA FIJA EN MÓVIL: precio y botón siempre a mano -->
++      <div v-if="!isClosedForSale" class="buybar" role="region" aria-label="Comprar entrada">
++        <div class="buybar__price">
++          <small>Entrada</small>
++          <strong>{{ event.price === 0 ? 'Gratis' : money(event.price, event.currency) }}</strong>
++        </div>
++        <q-btn
++          unelevated
++          rounded
++          no-caps
++          color="primary"
++          icon="confirmation_number"
++          class="buybar__cta btn-buy"
++          :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
++          :disable="isSoldOut"
++          @click="handleBuyAction"
++        />
++      </div>
+     </template>
+   </q-page>
+ </template>
+ 
+ <style scoped>
++/* Cabecera inmersiva */
++.detail-hero {
++  position: relative;
++  min-height: 380px;
++  display: flex;
++  align-items: flex-end;
++  overflow: hidden;
++  color: #ffffff;
++  background: linear-gradient(135deg, #24156b 0%, #5038b9 55%, #a8327a 100%);
++}
++
++.detail-hero__bg {
++  position: absolute;
++  inset: 0;
++  background-size: cover;
++  background-position: center;
++}
++
++.detail-hero.is-closed .detail-hero__bg {
++  filter: grayscale(0.6);
++}
++
++.detail-hero__shade {
++  position: absolute;
++  inset: 0;
++  background: linear-gradient(180deg, rgba(10, 8, 20, 0.3) 0%, rgba(10, 8, 20, 0.55) 50%, rgba(10, 8, 20, 0.92) 100%);
++}
++
++.detail-hero__content {
++  position: relative;
++  width: 100%;
++  max-width: 1190px;
++  margin: 0 auto;
++  padding: 84px 24px 30px;
++}
++
++.detail-back {
++  position: absolute;
++  top: 22px;
++  left: 24px;
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++  min-height: 40px;
++  padding: 0 14px;
++  border-radius: 999px;
++  background: rgba(10, 8, 20, 0.45);
++  backdrop-filter: blur(8px);
++  color: #ffffff;
++  font-size: 14px;
++  font-weight: 700;
++  text-decoration: none;
++}
++
++.detail-back:hover,
++.detail-back:focus-visible {
++  background: rgba(10, 8, 20, 0.7);
++}
++
++.detail-hero__eyebrow {
++  font-size: 12px;
++  font-weight: 800;
++  letter-spacing: 0.14em;
++  text-transform: uppercase;
++  color: rgba(255, 255, 255, 0.88);
++}
++
++.detail-hero__title {
++  margin: 8px 0 12px;
++  max-width: 900px;
++  font-size: clamp(32px, 5.2vw, 56px);
++  line-height: 1.05;
++  font-weight: 900;
++  letter-spacing: -0.02em;
++  color: #ffffff;
++}
++
++.detail-hero__meta {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 8px 20px;
++  margin: 0 0 14px;
++  font-size: 16px;
++  font-weight: 700;
++  color: rgba(255, 255, 255, 0.94);
++}
++
++.detail-hero__meta span {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++}
++
++.detail-badges {
++  display: flex;
++  gap: 8px;
++  flex-wrap: wrap;
++}
++
++.detail-body {
++  padding-top: 8px;
++}
++
++.detail-body .detail-top {
++  margin-top: 20px;
++}
++
++.detail-description {
++  margin: 0;
++  font-size: 16.5px;
++  line-height: 1.75;
++  color: var(--text-primary);
++}
++
++/* Barra de compra fija sólo en móvil */
++.buybar {
++  display: none;
++}
++
++@media (max-width: 767px) {
++  .detail-hero {
++    min-height: 320px;
++  }
++  .detail-hero__content {
++    padding: 76px 16px 22px;
++  }
++  .detail-back {
++    left: 16px;
++    top: 16px;
++  }
++  .detail-page.has-buybar {
++    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
++  }
++  .buybar {
++    display: flex;
++    position: fixed;
++    left: 0;
++    right: 0;
++    bottom: 0;
++    z-index: 60;
++    align-items: center;
++    justify-content: space-between;
++    gap: 12px;
++    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
++    background: var(--bg-primary);
++    border-top: 1px solid var(--border-color);
++    box-shadow: 0 -10px 24px -14px rgba(0, 0, 0, 0.4);
++  }
++  .buybar__price {
++    display: flex;
++    flex-direction: column;
++    line-height: 1.15;
++  }
++  .buybar__price small {
++    font-size: 11px;
++    font-weight: 800;
++    letter-spacing: 0.08em;
++    text-transform: uppercase;
++    color: var(--text-secondary);
++  }
++  .buybar__price strong {
++    font-size: 20px;
++    font-weight: 900;
++    color: var(--text-primary);
++  }
++  .buybar__cta {
++    min-height: 48px;
++    padding: 0 22px;
++    font-weight: 800;
++  }
++}
++
+ .detail-grid {
+   align-items: start;
+ }
+@@ -543,7 +758,7 @@ onBeforeUnmount(() => {
+ .section-card-title {
+   font-size: 19px;
+   font-weight: 700;
+-  color: var(--ink);
++  color: var(--text-primary);
+   margin: 0 0 14px;
+ }
+ 
+@@ -579,21 +794,23 @@ onBeforeUnmount(() => {
+ }
+ 
+ .archive-finished {
+-  background: #f1f5f9;
+-  color: #334155;
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
++  color: var(--text-secondary);
+ }
+ 
+ .archive-cancelled {
+-  background: #fef2f2;
+-  color: #b91c1c;
++  background: rgba(220, 38, 38, 0.12);
++  border: 1px solid rgba(220, 38, 38, 0.35);
++  color: #dc2626;
+ }
+ 
+ .archive-stat-box {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+-  background: #f8fafc;
+-  border: 1px solid #e2e8f0;
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
+   border-radius: 12px;
+   padding: 12px 14px;
+   margin-bottom: 6px;
+@@ -607,15 +824,15 @@ onBeforeUnmount(() => {
+   gap: 16px;
+   flex-wrap: wrap;
+   padding-bottom: 16px;
+-  border-bottom: 1px solid var(--line, #e5e7eb);
++  border-bottom: 1px solid var(--border-color);
+ }
+ 
+ .rating-summary-pill {
+   display: flex;
+   align-items: center;
+   gap: 12px;
+-  background: #f8fafc;
+-  border: 1px solid #e2e8f0;
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
+   padding: 10px 16px;
+   border-radius: 14px;
+ }
+@@ -623,7 +840,7 @@ onBeforeUnmount(() => {
+ .rating-big {
+   font-size: 28px;
+   font-weight: 800;
+-  color: var(--ink, #111827);
++  color: var(--text-primary);
+   line-height: 1;
+ }
+ 
+@@ -640,7 +857,7 @@ onBeforeUnmount(() => {
+ }
+ 
+ .star-off {
+-  color: #cbd5e1;
++  color: var(--border-color);
+ }
+ 
+ .reviews-list {
+@@ -651,8 +868,8 @@ onBeforeUnmount(() => {
+ }
+ 
+ .review-card {
+-  background: #f8fafc;
+-  border: 1px solid #e2e8f0;
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
+   border-radius: 14px;
+   padding: 16px;
+ }
+@@ -675,8 +892,8 @@ onBeforeUnmount(() => {
+   width: 34px;
+   height: 34px;
+   border-radius: 50%;
+-  background: #ede9fe;
+-  color: #5b21b6;
++  background: rgba(124, 92, 245, 0.16);
++  color: var(--brand);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+@@ -685,23 +902,23 @@ onBeforeUnmount(() => {
+ .review-author__name {
+   font-weight: 700;
+   font-size: 14px;
+-  color: var(--ink, #111827);
++  color: var(--text-primary);
+ }
+ 
+ .review-card__body {
+   margin: 0;
+   font-size: 14.5px;
+   line-height: 1.5;
+-  color: #334155;
++  color: var(--text-primary);
+ }
+ 
+ .reviewed-banner {
+   margin-top: 20px;
+   padding: 14px 18px;
+   border-radius: 14px;
+-  background: #ecfdf5;
+-  border: 1px solid #bbf7d0;
+-  color: #14532d;
++  background: rgba(18, 163, 114, 0.12);
++  border: 1px solid rgba(18, 163, 114, 0.35);
++  color: var(--text-primary);
+   display: flex;
+   align-items: center;
+   gap: 12px;
+@@ -711,8 +928,8 @@ onBeforeUnmount(() => {
+   margin-top: 20px;
+   padding: 20px;
+   border-radius: 16px;
+-  background: #f8fafc;
+-  border: 1px solid #e2e8f0;
++  background: var(--bg-primary);
++  border: 1px solid var(--border-color);
+ }
+ 
+ .review-composer__head {
+diff --git a/src/pages/public/Explore.vue b/src/pages/public/Explore.vue
+index 9b75326..977fad8 100644
+--- a/src/pages/public/Explore.vue
++++ b/src/pages/public/Explore.vue
+@@ -1,7 +1,33 @@
+ <script setup>
+-import { onMounted, reactive, ref } from 'vue'
++import { computed, onMounted, reactive, ref } from 'vue'
+ import EventCard from '@/components/events/EventCard.vue'
++import LoadError from '@/components/common/LoadError.vue'
+ import { eventService } from '@/services/eventService'
++import { limaDayKey } from '@/utils/formatters'
++
++const LOAD_EVENTS_FAILED = 'No pudimos cargar los eventos a tiempo. Verifica tu conexión e inténtalo otra vez.'
++
++function loadMessage(e) {
++  return e && (e.kind === 'timeout' || e.kind === 'network') ? LOAD_EVENTS_FAILED : (e && e.message) || LOAD_EVENTS_FAILED
++}
++
++// Íconos por nombre de categoría (cualquier otra usa el ícono genérico)
++const CATEGORY_ICONS = [
++  [/rock|metal|punk/i, 'music_note'],
++  [/electr|techno|house|dj/i, 'graphic_eq'],
++  [/cumbia|salsa|fiesta|baile/i, 'celebration'],
++  [/jazz|blues|cl[aá]sica|piano/i, 'piano'],
++  [/teatro|comedia|stand/i, 'theater_comedy'],
++  [/taller|curso|workshop/i, 'palette'],
++  [/feria|gastro|comida/i, 'storefront'],
++  [/deporte|running|f[uú]tbol/i, 'sports_soccer'],
++  [/conferencia|charla|tech/i, 'mic']
++]
++
++function categoryIcon(name) {
++  const hit = CATEGORY_ICONS.find(([re]) => re.test(String(name || '')))
++  return hit ? hit[1] : 'local_activity'
++}
+ 
+ const events = ref([])
+ const categories = ref([])
+@@ -18,6 +44,122 @@ const filter = reactive({
+   to: ''
+ })
+ 
++// Atajos de fecha y precio (el precio se filtra sobre la página cargada)
++const quick = reactive({
++  when: '',
++  price: ''
++})
++
++const CITY_SUGGESTIONS = ['Lima', 'Arequipa', 'Cusco', 'Trujillo', 'Chiclayo', 'Piura', 'Iquitos', 'Huancayo']
++const cityOptions = ref(CITY_SUGGESTIONS.slice())
++
++const PRICE_OPTIONS = [
++  { value: '', label: 'Todos los precios' },
++  { value: 'free', label: 'Gratis' },
++  { value: 'upto50', label: 'Hasta S/ 50' },
++  { value: 'upto100', label: 'Hasta S/ 100' },
++  { value: 'over100', label: 'Más de S/ 100' }
++]
++
++const dateDraft = reactive({ from: '', to: '' })
++
++function pad(n) {
++  return n < 10 ? '0' + n : String(n)
++}
++
++// Fecha local YYYY-MM-DD (no UTC: de noche en Perú UTC ya es el día siguiente)
++function localDay(d) {
++  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
++}
++
++function weekendRange() {
++  const today = new Date()
++  const day = today.getDay()
++  const start = new Date(today)
++  if (day !== 5 && day !== 6 && day !== 0) {
++    start.setDate(today.getDate() + (5 - day))
++  }
++  const sunday = new Date(today)
++  sunday.setDate(today.getDate() + (day === 0 ? 0 : 7 - day))
++  return { from: localDay(start), to: localDay(sunday) }
++}
++
++const categoryLabel = computed(() => {
++  const found = categories.value.find((c) => c.id === filter.categoryId)
++  return found ? found.name : 'Género'
++})
++
++const priceLabel = computed(() => {
++  const found = PRICE_OPTIONS.find((p) => p.value === quick.price)
++  return quick.price && found ? found.label : 'Precio'
++})
++
++function shortDay(value) {
++  return value.slice(8) + '/' + value.slice(5, 7)
++}
++
++const datesLabel = computed(() => {
++  if (quick.when !== 'range') return 'Fechas'
++  if (filter.from && filter.to) return shortDay(filter.from) + ' – ' + shortDay(filter.to)
++  if (filter.from) return 'Desde ' + shortDay(filter.from)
++  if (filter.to) return 'Hasta ' + shortDay(filter.to)
++  return 'Fechas'
++})
++
++const hasFilters = computed(() =>
++  Boolean(filter.query || filter.categoryId || filter.city || filter.from || filter.to || quick.price)
++)
++
++function matchesPrice(event) {
++  const price = Number(event.price) || 0
++  if (quick.price === 'free') return price === 0
++  if (quick.price === 'upto50') return price <= 50
++  if (quick.price === 'upto100') return price <= 100
++  if (quick.price === 'over100') return price > 100
++  return true
++}
++
++const visibleEvents = computed(() =>
++  events.value
++    .filter(matchesPrice)
++    .slice()
++    .sort((a, b) => new Date(a.startDate || 0) - new Date(b.startDate || 0))
++)
++
++const curatedMode = computed(() => !hasFilters.value && !quick.when && page.value === 1)
++
++function soldRatio(event) {
++  const cap = Number(event.capacity) || 0
++  const spots = typeof event.availableSpots === 'number' ? event.availableSpots : null
++  if (!cap || spots === null) return 0
++  return (cap - spots) / cap
++}
++
++function soldOut(event) {
++  return event.isSoldOut === true || (typeof event.availableSpots === 'number' && event.availableSpots <= 0)
++}
++
++const sections = computed(() => {
++  const list = visibleEvents.value
++  const range = weekendRange()
++  const inWeekend = (e) => {
++    if (!e.startDate) return false
++    const key = limaDayKey(e.startDate)
++    return key >= range.from && key <= range.to
++  }
++  const out = []
++  const weekend = list.filter(inWeekend).slice(0, 3)
++  if (weekend.length) out.push({ key: 'weekend', title: 'Este fin de semana', icon: 'weekend', items: weekend })
++  const trending = list
++    .filter((e) => !soldOut(e) && soldRatio(e) >= 0.5)
++    .sort((a, b) => soldRatio(b) - soldRatio(a))
++    .slice(0, 3)
++  if (trending.length) out.push({ key: 'trending', title: 'Tendencias', icon: 'local_fire_department', items: trending })
++  const free = list.filter((e) => !(Number(e.price) > 0)).slice(0, 3)
++  if (free.length) out.push({ key: 'free', title: 'Gratis', icon: 'redeem', items: free })
++  return out
++})
++
+ async function search(reset = true) {
+   if (reset) page.value = 1
+   busy.value = true
+@@ -30,13 +172,71 @@ async function search(reset = true) {
+     })
+     next.value = events.value.length === 12
+   } catch (e) {
+-    error.value = e.message
++    error.value = loadMessage(e)
+     events.value = []
+   } finally {
+     busy.value = false
+   }
+ }
+ 
++function setWhen(kind) {
++  if (quick.when === kind) {
++    quick.when = ''
++    filter.from = ''
++    filter.to = ''
++  } else if (kind === 'today') {
++    quick.when = 'today'
++    filter.from = localDay(new Date())
++    filter.to = filter.from
++  } else if (kind === 'weekend') {
++    quick.when = 'weekend'
++    const range = weekendRange()
++    filter.from = range.from
++    filter.to = range.to
++  }
++  search()
++}
++
++function applyDates() {
++  if (!dateDraft.from && !dateDraft.to) {
++    clearDates()
++    return
++  }
++  quick.when = 'range'
++  filter.from = dateDraft.from
++  filter.to = dateDraft.to
++  search()
++}
++
++function clearDates() {
++  quick.when = ''
++  filter.from = ''
++  filter.to = ''
++  dateDraft.from = ''
++  dateDraft.to = ''
++  search()
++}
++
++function setCategory(id) {
++  filter.categoryId = id
++  search()
++}
++
++function setPrice(value) {
++  quick.price = value
++}
++
++function filterCities(val, update) {
++  update(() => {
++    const needle = String(val || '').toLowerCase()
++    cityOptions.value = CITY_SUGGESTIONS.filter((c) => c.toLowerCase().includes(needle))
++  })
++}
++
++function setCity(val) {
++  filter.city = val || ''
++}
++
+ function clear() {
+   Object.assign(filter, {
+     query: '',
+@@ -45,38 +245,83 @@ function clear() {
+     from: '',
+     to: ''
+   })
++  quick.when = ''
++  quick.price = ''
++  dateDraft.from = ''
++  dateDraft.to = ''
+   search()
+ }
+ 
+ async function move(delta) {
+   page.value += delta
+   await search(false)
++  window.scrollTo({ top: 0, behavior: 'smooth' })
+ }
+ 
+ onMounted(async () => {
+   try {
+     categories.value = await eventService.getCategories()
+-  } catch (e) {
+-    error.value = e.message
++  } catch {
++    // Sin categorías la página sigue funcionando; el error visible lo da la carga de eventos.
++    categories.value = []
+   }
+   await search()
+ })
+ </script>
+ 
+ <template>
+-  <q-page>
+-    <section class="hero">
++  <q-page class="explore-page">
++    <section class="hero hero--compact">
+       <div class="hero-copy">
+         <div class="eyebrow">TU CIUDAD TIENE MUCHO QUE CONTAR</div>
+-        <h1>Sal de la rutina.<br /><em>Encuentra tu próximo plan.</em></h1>
+-        <p>
+-          Conciertos, talleres, ferias y experiencias locales.<br />Descubre lo que pasa cerca de
+-          ti.
+-        </p>
+-        <div class="hero-chips">
+-          <span>Hecho en Perú</span>
+-          <span>Experiencias para todos</span>
+-        </div>
++        <h1>Sal de la rutina. <em>Encuentra tu próximo plan.</em></h1>
++        <p>Conciertos, talleres, ferias y experiencias locales cerca de ti.</p>
++
++        <!-- Buscador dual: evento + ciudad -->
++        <q-form class="ui-search" role="search" @submit="search()">
++          <q-input
++            v-model="filter.query"
++            outlined
++            rounded
++            clearable
++            class="ui-search__query"
++            placeholder="Busca artista, evento o sala"
++            aria-label="Buscar por artista, evento o sala"
++          >
++            <template #prepend><q-icon name="search" /></template>
++          </q-input>
++          <q-select
++            :model-value="filter.city || null"
++            outlined
++            rounded
++            use-input
++            fill-input
++            hide-selected
++            clearable
++            input-debounce="0"
++            new-value-mode="add-unique"
++            :options="cityOptions"
++            class="ui-search__city"
++            placeholder="Ciudad"
++            aria-label="Ciudad"
++            @filter="filterCities"
++            @input-value="setCity"
++            @update:model-value="setCity"
++          >
++            <template #prepend><q-icon name="place" /></template>
++          </q-select>
++          <q-btn
++            type="submit"
++            color="primary"
++            unelevated
++            rounded
++            no-caps
++            label="Buscar"
++            icon="search"
++            :loading="busy"
++            class="ui-search__btn"
++          />
++        </q-form>
+       </div>
+       <div class="hero-art" aria-hidden="true">
+         <span class="orbit one"></span>
+@@ -92,72 +337,445 @@ onMounted(async () => {
+     </section>
+ 
+     <main class="container">
+-      <q-form class="search-panel" @submit="search()">
+-        <q-input
+-          v-model="filter.query"
+-          outlined
+-          label="¿Qué te gustaría hacer?"
+-          clearable
+-          class="search-main"
+-        />
+-        <q-select
+-          v-model="filter.categoryId"
+-          outlined
+-          :options="categories"
+-          option-value="id"
+-          option-label="name"
+-          emit-value
+-          map-options
+-          clearable
+-          label="Categoría"
+-        />
+-        <q-input v-model="filter.city" outlined label="Ciudad" />
+-        <q-btn
+-          type="submit"
+-          color="primary"
+-          unelevated
+-          no-caps
+-          label="Buscar eventos"
+-          :loading="busy"
+-        />
+-        <q-input v-model="filter.from" outlined type="date" label="Desde" stack-label />
+-        <q-input v-model="filter.to" outlined type="date" label="Hasta" stack-label />
+-        <q-btn flat no-caps label="Limpiar filtros" @click="clear" />
+-      </q-form>
+-
+-      <div class="section-title">
+-        <div>
+-          <div class="eyebrow">ELIGE TU EXPERIENCIA</div>
+-          <h2>Descubre eventos</h2>
+-        </div>
+-        <span>Página {{ page }}</span>
++      <!-- Categorías visibles (estilo Joinnus/Eventbrite) -->
++      <nav v-if="categories.length" class="ui-cats" aria-label="Categorías">
++        <button
++          type="button"
++          class="ui-cat"
++          :class="{ 'is-active': !filter.categoryId }"
++          :aria-pressed="!filter.categoryId"
++          @click="setCategory(null)"
++        >
++          <q-icon name="apps" size="22px" aria-hidden="true" />
++          <span>Todo</span>
++        </button>
++        <button
++          v-for="c in categories"
++          :key="c.id"
++          type="button"
++          class="ui-cat"
++          :class="{ 'is-active': filter.categoryId === c.id }"
++          :aria-pressed="filter.categoryId === c.id"
++          @click="setCategory(filter.categoryId === c.id ? null : c.id)"
++        >
++          <q-icon :name="categoryIcon(c.name)" size="22px" aria-hidden="true" />
++          <span>{{ c.name }}</span>
++        </button>
++      </nav>
++
++      <!-- Filtros rápidos -->
++      <div class="ui-pills" role="toolbar" aria-label="Filtros rápidos">
++        <button
++          type="button"
++          class="ui-pill"
++          :class="{ 'is-active': quick.when === 'today' }"
++          :aria-pressed="quick.when === 'today'"
++          @click="setWhen('today')"
++        >
++          Hoy
++        </button>
++        <button
++          type="button"
++          class="ui-pill"
++          :class="{ 'is-active': quick.when === 'weekend' }"
++          :aria-pressed="quick.when === 'weekend'"
++          @click="setWhen('weekend')"
++        >
++          Este fin de semana
++        </button>
++
++        <button type="button" class="ui-pill" :class="{ 'is-active': quick.when === 'range' }">
++          <q-icon name="calendar_month" size="16px" aria-hidden="true" />
++          {{ datesLabel }}
++          <q-icon name="expand_more" size="16px" aria-hidden="true" />
++          <q-menu anchor="bottom left" self="top left" :offset="[0, 8]">
++            <div class="ui-dates">
++              <q-input v-model="dateDraft.from" outlined dense type="date" label="Desde" stack-label />
++              <q-input v-model="dateDraft.to" outlined dense type="date" label="Hasta" stack-label />
++              <div class="ui-dates__actions">
++                <q-btn v-close-popup flat no-caps label="Quitar" @click="clearDates" />
++                <q-btn v-close-popup unelevated rounded no-caps color="primary" label="Aplicar" @click="applyDates" />
++              </div>
++            </div>
++          </q-menu>
++        </button>
++
++        <button type="button" class="ui-pill" :class="{ 'is-active': quick.price }">
++          <q-icon name="sell" size="16px" aria-hidden="true" />
++          {{ priceLabel }}
++          <q-icon name="expand_more" size="16px" aria-hidden="true" />
++          <q-menu anchor="bottom left" self="top left" :offset="[0, 8]" auto-close>
++            <q-list style="min-width: 180px">
++              <q-item
++                v-for="p in PRICE_OPTIONS"
++                :key="p.value || 'all'"
++                clickable
++                :active="quick.price === p.value"
++                @click="setPrice(p.value)"
++              >
++                <q-item-section>{{ p.label }}</q-item-section>
++              </q-item>
++            </q-list>
++          </q-menu>
++        </button>
++
++        <button v-if="hasFilters" type="button" class="ui-pill ui-pill--ghost" @click="clear">
++          <q-icon name="close" size="16px" aria-hidden="true" />
++          Limpiar
++        </button>
+       </div>
+ 
+-      <q-banner v-if="error" class="error" role="alert">
+-        {{ error }} <q-btn flat label="Reintentar" @click="search()" />
+-      </q-banner>
++      <LoadError v-if="error" :message="error" :busy="busy" @retry="search(false)" />
+ 
+-      <div v-if="busy" class="empty"><q-spinner size="36px" color="primary" /> Buscando eventos…</div>
++      <div v-else-if="busy" class="ui-skeleton-grid" aria-busy="true" aria-label="Buscando eventos">
++        <div v-for="n in 6" :key="n" class="ui-skeleton"></div>
++      </div>
+ 
+-      <div v-else-if="!events.length && !error" class="empty">
++      <div v-else-if="!visibleEvents.length" class="ui-empty">
++        <q-icon name="event_busy" size="44px" aria-hidden="true" />
+         <h3>No hay eventos para estos filtros</h3>
+         <p>Prueba otra ciudad, categoría o fecha.</p>
+-        <q-btn flat label="Limpiar filtros" @click="clear" />
++        <q-btn v-if="hasFilters" unelevated rounded no-caps color="primary" label="Limpiar filtros" @click="clear" />
+       </div>
+ 
+-      <div v-else class="event-grid">
+-        <EventCard
+-          v-for="(event, index) in events"
+-          :key="event.id"
+-          :event="event"
+-          :index="index"
+-        />
+-      </div>
++      <template v-else>
++        <!-- Secciones curadas, sólo sin filtros -->
++        <template v-if="curatedMode">
++          <section v-for="s in sections" :key="s.key" class="ui-rail">
++            <h2 class="ui-rail__title">
++              <q-icon :name="s.icon" size="22px" aria-hidden="true" />
++              {{ s.title }}
++            </h2>
++            <div class="event-grid ui-rail__grid">
++              <EventCard v-for="(event, index) in s.items" :key="s.key + '-' + event.id" :event="event" :index="index" />
++            </div>
++          </section>
++        </template>
++
++        <section class="ui-rail">
++          <div class="ui-rail__head">
++            <h2 class="ui-rail__title">
++              <q-icon :name="curatedMode ? 'event' : 'search'" size="22px" aria-hidden="true" />
++              {{ curatedMode ? 'Próximos eventos' : 'Resultados' }}
++            </h2>
++            <span class="ui-rail__meta">
++              Página {{ page }}
++              <template v-if="quick.price"> · precio filtrado en esta página</template>
++            </span>
++          </div>
++          <div class="event-grid">
++            <EventCard v-for="(event, index) in visibleEvents" :key="event.id" :event="event" :index="index" />
++          </div>
++        </section>
++      </template>
+ 
+-      <div class="pagination">
+-        <q-btn flat no-caps label="Anterior" :disable="page === 1 || busy" @click="move(-1)" />
+-        <q-btn flat no-caps label="Siguiente" :disable="!next || busy" @click="move(1)" />
++      <div v-if="!error" class="pagination">
++        <q-btn flat rounded no-caps icon="chevron_left" label="Anterior" :disable="page === 1 || busy" @click="move(-1)" />
++        <q-btn flat rounded no-caps icon-right="chevron_right" label="Siguiente" :disable="!next || busy" @click="move(1)" />
+       </div>
+     </main>
+   </q-page>
+-</template>
+\ No newline at end of file
++</template>
++
++<style scoped>
++.ui-search {
++  display: grid;
++  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
++  gap: 10px;
++  align-items: center;
++  padding: 14px;
++  border-radius: 22px;
++  background: var(--bg-secondary);
++  border: 1px solid var(--border-color);
++  box-shadow: 0 10px 30px -18px rgba(20, 10, 60, 0.35);
++  margin-top: 20px;
++  position: relative;
++  z-index: 2;
++}
++
++.ui-search__btn {
++  min-height: 48px;
++  padding: 0 22px;
++  font-weight: 800;
++}
++
++.ui-pills {
++  display: flex;
++  gap: 8px;
++  margin: 18px 0 6px;
++  overflow-x: auto;
++  scrollbar-width: none;
++  padding-bottom: 4px;
++  -webkit-overflow-scrolling: touch;
++}
++
++.ui-pills::-webkit-scrollbar {
++  display: none;
++}
++
++.ui-pill {
++  flex: 0 0 auto;
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++  min-height: 44px;
++  padding: 0 16px;
++  border-radius: 999px;
++  border: 1px solid var(--border-color);
++  background: var(--bg-secondary);
++  color: var(--text-primary);
++  font: inherit;
++  font-size: 14px;
++  font-weight: 700;
++  cursor: pointer;
++  white-space: nowrap;
++  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
++}
++
++.ui-pill:hover {
++  border-color: var(--brand);
++}
++
++.ui-pill:active {
++  transform: scale(0.97);
++}
++
++.ui-pill:focus-visible {
++  outline: 2px solid var(--brand);
++  outline-offset: 2px;
++}
++
++.ui-pill.is-active {
++  background: var(--brand);
++  border-color: var(--brand);
++  color: #ffffff;
++}
++
++.ui-pill--ghost {
++  background: transparent;
++  color: var(--text-secondary);
++}
++
++.ui-dates {
++  display: grid;
++  gap: 10px;
++  padding: 14px;
++  min-width: 240px;
++}
++
++.ui-dates__actions {
++  display: flex;
++  justify-content: flex-end;
++  gap: 6px;
++}
++
++.ui-empty {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  text-align: center;
++  gap: 6px;
++  padding: 48px 16px;
++  border: 1px dashed var(--border-color);
++  border-radius: 22px;
++  color: var(--text-secondary);
++}
++
++.ui-empty h3 {
++  margin: 6px 0 0;
++  font-size: 20px;
++  color: var(--text-primary);
++}
++
++.ui-empty p {
++  margin: 0 0 10px;
++}
++
++.ui-skeleton-grid {
++  display: grid;
++  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
++  gap: 20px;
++}
++
++.ui-skeleton {
++  height: 320px;
++  border-radius: 20px;
++  background: linear-gradient(90deg, var(--bg-secondary) 0%, var(--border-color) 50%, var(--bg-secondary) 100%);
++  background-size: 200% 100%;
++  animation: ui-shimmer 1.2s ease-in-out infinite;
++}
++
++@keyframes ui-shimmer {
++  from {
++    background-position: 200% 0;
++  }
++  to {
++    background-position: -200% 0;
++  }
++}
++
++@media (max-width: 760px) {
++  .ui-search {
++    grid-template-columns: 1fr;
++  }
++  .ui-search__btn {
++    width: 100%;
++  }
++}
++
++@media (prefers-reduced-motion: reduce) {
++  .ui-pill,
++  .ui-skeleton {
++    transition: none;
++    animation: none;
++  }
++}
++/* Portada compacta: buscador dentro, para ver categorías y eventos sin bajar */
++.hero--compact {
++  min-height: 0;
++  padding-top: 36px;
++  padding-bottom: 14px;
++  align-items: center;
++}
++
++.hero--compact h1 {
++  font-size: clamp(30px, 3.4vw, 46px);
++  margin-bottom: 10px;
++}
++
++.hero--compact .eyebrow {
++  margin-bottom: 12px;
++}
++
++.hero--compact p {
++  margin: 0 0 18px;
++  line-height: 1.5;
++}
++
++.hero--compact .ui-search {
++  margin-top: 0;
++  max-width: 760px;
++}
++
++.hero--compact .hero-art {
++  transform: scale(0.72);
++  transform-origin: top right;
++  height: 230px;
++  align-self: flex-start;
++}
++
++/* Categorías */
++.ui-cats {
++  display: flex;
++  gap: 10px;
++  margin: 6px 0 4px;
++  overflow-x: auto;
++  scrollbar-width: none;
++  padding-bottom: 4px;
++}
++
++.ui-cats::-webkit-scrollbar {
++  display: none;
++}
++
++.ui-cat {
++  flex: 0 0 auto;
++  display: inline-flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  gap: 6px;
++  min-width: 96px;
++  min-height: 78px;
++  padding: 10px 14px;
++  border-radius: 18px;
++  border: 1px solid var(--border-color);
++  background: var(--bg-secondary);
++  color: var(--text-primary);
++  font: inherit;
++  font-size: 13px;
++  font-weight: 700;
++  cursor: pointer;
++  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
++}
++
++.ui-cat .q-icon {
++  color: var(--brand);
++}
++
++.ui-cat:hover {
++  border-color: var(--brand);
++  transform: translateY(-1px);
++}
++
++.ui-cat:focus-visible {
++  outline: 2px solid var(--brand);
++  outline-offset: 2px;
++}
++
++.ui-cat.is-active {
++  background: var(--brand);
++  border-color: var(--brand);
++  color: #ffffff;
++}
++
++.ui-cat.is-active .q-icon {
++  color: #ffffff;
++}
++
++/* Secciones */
++.ui-rail {
++  margin-top: 30px;
++}
++
++.ui-rail__head {
++  display: flex;
++  align-items: baseline;
++  justify-content: space-between;
++  gap: 12px;
++}
++
++.ui-rail__title {
++  display: flex;
++  align-items: center;
++  gap: 8px;
++  margin: 0 0 14px;
++  font-size: 24px;
++  font-weight: 800;
++  letter-spacing: -0.02em;
++  line-height: 1.2;
++  color: var(--text-primary);
++}
++
++.ui-rail__title .q-icon {
++  color: var(--buy);
++}
++
++.ui-rail__meta {
++  font-size: 13px;
++  color: var(--text-secondary);
++}
++
++@media (max-width: 900px) {
++  .hero--compact .hero-art {
++    display: none;
++  }
++}
++
++@media (max-width: 600px) {
++  .ui-rail__grid {
++    display: flex;
++    overflow-x: auto;
++    scroll-snap-type: x mandatory;
++    gap: 14px;
++    padding-bottom: 6px;
++  }
++  .ui-rail__grid > * {
++    flex: 0 0 82%;
++    scroll-snap-align: start;
++  }
++  .ui-rail__title {
++    font-size: 20px;
++  }
++}
++</style>
+diff --git a/src/pages/user/Checkout.vue b/src/pages/user/Checkout.vue
+index 4bcaa3f..b5d57bc 100644
+--- a/src/pages/user/Checkout.vue
++++ b/src/pages/user/Checkout.vue
+@@ -182,7 +182,7 @@ onBeforeUnmount(() => {
+             :rules="[quantityRule]"
+           />
+ 
+-          <h3>Resumen de tu compra</h3>
++          <h3 class="checkout-summary-title">Resumen de tu compra</h3>
+           <q-markup-table flat bordered>
+             <tbody>
+               <tr>
+@@ -218,6 +218,7 @@ onBeforeUnmount(() => {
+           no-caps
+           color="primary"
+           label="Confirmar compra"
++          class="btn-buy"
+           :loading="buying"
+           :disable="!canBuy"
+           @click="confirm"
+@@ -227,3 +228,13 @@ onBeforeUnmount(() => {
+     </template>
+   </q-page>
+ </template>
++
++<style scoped>
++.checkout-summary-title {
++  margin: 18px 0 8px;
++  font-size: 20px;
++  line-height: 1.3;
++  font-weight: 800;
++  color: var(--text-primary);
++}
++</style>
+diff --git a/src/pages/user/MyTickets.vue b/src/pages/user/MyTickets.vue
+index 6f87945..f9a2346 100644
+--- a/src/pages/user/MyTickets.vue
++++ b/src/pages/user/MyTickets.vue
+@@ -119,6 +119,24 @@ onMounted(() => {
+   padding: 6px;
+   border-radius: 999px;
+   margin-bottom: 28px;
++  max-width: 100%;
++}
++
++@media (max-width: 600px) {
++  .tickets-filter-bar {
++    display: flex;
++    flex-wrap: nowrap;
++    overflow-x: auto;
++    scrollbar-width: none;
++    border-radius: 18px;
++  }
++  .tickets-filter-bar::-webkit-scrollbar {
++    display: none;
++  }
++  .tickets-pill {
++    flex: 0 0 auto;
++    white-space: nowrap;
++  }
+ }
+ 
+ .tickets-pill {
+@@ -137,9 +155,9 @@ onMounted(() => {
+ }
+ 
+ .tickets-pill--active {
+-  background: #ffffff;
+-  color: var(--ink);
+-  box-shadow: 0 2px 10px #231b3c18;
++  background: var(--bg-primary);
++  color: var(--text-primary);
++  box-shadow: 0 2px 10px color-mix(in srgb, var(--text-primary) 8%, transparent);
+ }
+ 
+ .tickets-list {
+diff --git a/src/services/httpClient.js b/src/services/httpClient.js
+index 2285514..a58e8e8 100644
+--- a/src/services/httpClient.js
++++ b/src/services/httpClient.js
+@@ -5,6 +5,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+ export async function api(path, { timeoutMs = 15000, ...options } = {}) {
+   const controller = new AbortController()
+   const timer = setTimeout(() => controller.abort(), timeoutMs)
++  let reached = false
+ 
+   try {
+     const response = await fetch(BASE_URL + path, {
+@@ -17,6 +18,7 @@ export async function api(path, { timeoutMs = 15000, ...options } = {}) {
+       }
+     })
+ 
++    reached = true
+     const data = response.status === 204 ? null : await response.json().catch(() => null)
+ 
+     if (!response.ok) {
+@@ -39,7 +41,14 @@ export async function api(path, { timeoutMs = 15000, ...options } = {}) {
+     return data
+   } catch (error) {
+     if (error.name === 'AbortError') {
+-      throw new Error('La API tardó demasiado. Intenta nuevamente.')
++      const late = new Error('No pudimos conectar a tiempo. Verifica tu conexión e inténtalo otra vez.')
++      late.kind = 'timeout'
++      throw late
++    }
++    if (error instanceof TypeError && !reached) {
++      const offline = new Error('No pudimos conectar con el servidor. Verifica tu conexión e inténtalo otra vez.')
++      offline.kind = 'network'
++      throw offline
+     }
+     throw error
+   } finally {
+diff --git a/src/utils/formatters.js b/src/utils/formatters.js
+index 0b87c87..afd314d 100644
+--- a/src/utils/formatters.js
++++ b/src/utils/formatters.js
+@@ -13,4 +13,56 @@ export function date(value) {
+         timeZone: 'America/Lima'
+       }).format(new Date(value))
+     : 'Por confirmar'
+-}
+\ No newline at end of file
++}
++
++const LIMA = 'America/Lima'
++
++function parts(value, options) {
++  const out = {}
++  for (const p of new Intl.DateTimeFormat('es-PE', { timeZone: LIMA, ...options }).formatToParts(new Date(value))) {
++    out[p.type] = p.value
++  }
++  return out
++}
++
++function clean(text) {
++  return String(text || '').replace('.', '').toLowerCase()
++}
++
++// Formato corto para tarjetas: "sáb 14 dic · 21:00"
++export function shortDate(value) {
++  if (!value) return 'Por confirmar'
++  const d = new Date(value)
++  if (Number.isNaN(d.getTime())) return 'Por confirmar'
++  const p = parts(value, {
++    weekday: 'short',
++    day: 'numeric',
++    month: 'short',
++    hour: '2-digit',
++    minute: '2-digit',
++    hourCycle: 'h23'
++  })
++  return clean(p.weekday) + ' ' + p.day + ' ' + clean(p.month) + ' · ' + p.hour + ':' + p.minute
++}
++
++// Clave de día en hora de Lima: "2026-12-14"
++export function limaDayKey(value) {
++  const p = parts(value, { year: 'numeric', month: '2-digit', day: '2-digit' })
++  return p.year + '-' + p.month + '-' + p.day
++}
++
++// Encabezado de grupo por día: "Hoy", "Mañana" o "Sábado, 14 de diciembre"
++export function dayHeading(value) {
++  if (!value) return 'Fecha por confirmar'
++  const key = limaDayKey(value)
++  const now = new Date()
++  if (key === limaDayKey(now)) return 'Hoy'
++  if (key === limaDayKey(new Date(now.getTime() + 86400000))) return 'Mañana'
++  const text = new Intl.DateTimeFormat('es-PE', {
++    timeZone: LIMA,
++    weekday: 'long',
++    day: 'numeric',
++    month: 'long'
++  }).format(new Date(value))
++  return text.charAt(0).toUpperCase() + text.slice(1)
++}
+diff --git a/src/utils/themeManager.js b/src/utils/themeManager.js
+new file mode 100644
+index 0000000..51e5a04
+--- /dev/null
++++ b/src/utils/themeManager.js
+@@ -0,0 +1,59 @@
++import { ref } from 'vue'
++import { Dark } from 'quasar'
++
++export const THEME_OPTIONS = {
++  SYSTEM: 'system',
++  LIGHT: 'light',
++  DARK: 'dark'
++}
++
++const STORAGE_KEY = 'app-theme-preference'
++const VALID = [THEME_OPTIONS.SYSTEM, THEME_OPTIONS.LIGHT, THEME_OPTIONS.DARK]
++
++export function getStoredTheme() {
++  try {
++    const value = localStorage.getItem(STORAGE_KEY)
++    return VALID.includes(value) ? value : THEME_OPTIONS.SYSTEM
++  } catch {
++    return THEME_OPTIONS.SYSTEM
++  }
++}
++
++// Elección actual, reactiva para el selector del encabezado
++export const themeChoice = ref(getStoredTheme())
++
++// Valor para la opción "dark" de Quasar: 'auto' sigue al sistema
++export function quasarDarkSetting(theme = themeChoice.value) {
++  if (theme === THEME_OPTIONS.DARK) return true
++  if (theme === THEME_OPTIONS.LIGHT) return false
++  return 'auto'
++}
++
++function applyAttribute(theme) {
++  const root = document.documentElement
++  if (theme === THEME_OPTIONS.SYSTEM) root.removeAttribute('data-theme')
++  else root.setAttribute('data-theme', theme)
++}
++
++// Aplica la elección a las variables CSS y a los componentes de Quasar
++export function applyTheme(theme) {
++  applyAttribute(theme)
++  Dark.set(quasarDarkSetting(theme))
++}
++
++export function setTheme(theme) {
++  if (!VALID.includes(theme)) return
++  themeChoice.value = theme
++  try {
++    localStorage.setItem(STORAGE_KEY, theme)
++  } catch {
++    // Sin almacenamiento disponible: la elección vale sólo en esta pestaña
++  }
++  applyTheme(theme)
++}
++
++// Antes de montar: sólo el atributo, para que las variables CSS no parpadeen.
++// Quasar toma su modo de la opción config.dark en main.js.
++export function initializeTheme() {
++  applyAttribute(themeChoice.value)
++}

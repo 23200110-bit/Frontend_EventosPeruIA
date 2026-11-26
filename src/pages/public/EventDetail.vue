@@ -2,10 +2,11 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import EventCard from '@/components/events/EventCard.vue'
+import LoadError from '@/components/common/LoadError.vue'
 import { eventService } from '@/services/eventService'
 import { ticketService } from '@/services/ticketService'
 import { session } from '@/stores/authStore'
-import { date, money } from '@/utils/formatters'
+import { date, money, shortDate } from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,21 +183,37 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-page class="container">
-    <router-link to="/explorar" class="back-link">← Volver a explorar</router-link>
-
-    <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
-    <div v-if="busy" class="empty"><q-spinner /> Cargando evento…</div>
+  <q-page class="detail-page" :class="{ 'has-buybar': event && !isClosedForSale }">
+    <div v-if="!event" class="container">
+      <router-link to="/explorar" class="back-link">← Volver a explorar</router-link>
+      <LoadError v-if="error && !busy" :message="error" :busy="busy" @retry="load" />
+      <div v-if="busy" class="empty"><q-spinner /> Cargando evento…</div>
+    </div>
 
     <template v-if="event">
-      <div class="detail-top detail-grid">
-        <!-- COLUMNA PRINCIPAL IZQUIERDA -->
-        <div class="detail-main">
-          <div class="eyebrow">{{ event.category }} · {{ event.city }}</div>
-          <h1 class="page-heading">{{ event.name }}</h1>
+      <!-- CABECERA INMERSIVA: imagen a todo el ancho con degradado para leer el texto -->
+      <header class="detail-hero" :class="{ 'is-closed': isClosedForSale }">
+        <div
+          class="detail-hero__bg"
+          :style="event.imageUrl ? { backgroundImage: 'url(' + JSON.stringify(event.imageUrl) + ')' } : null"
+          aria-hidden="true"
+        ></div>
+        <div class="detail-hero__shade" aria-hidden="true"></div>
+        <div class="detail-hero__content">
+          <router-link to="/explorar" class="detail-back">
+            <q-icon name="arrow_back" size="18px" aria-hidden="true" /> Explorar
+          </router-link>
+          <div class="detail-hero__eyebrow">{{ [event.category, event.city].filter(Boolean).join(' · ') }}</div>
+          <h1 class="detail-hero__title">{{ event.name }}</h1>
+          <p class="detail-hero__meta">
+            <span><q-icon name="event" size="18px" aria-hidden="true" /> {{ shortDate(event.startDate) }}</span>
+            <span v-if="event.venue || event.address">
+              <q-icon name="place" size="18px" aria-hidden="true" /> {{ event.venue || event.address }}
+            </span>
+          </p>
 
           <!-- Badges de estado y valoración -->
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <div class="detail-badges">
             <q-badge
               :color="isCancelled ? 'negative' : isFinished ? 'grey-8' : 'primary'"
               style="padding: 5px 10px; font-weight: 700;"
@@ -219,7 +236,14 @@ onBeforeUnmount(() => {
               ★ {{ Number(summary.averageRating).toFixed(1) }} ({{ summary.totalReviews }})
             </q-badge>
           </div>
+        </div>
+      </header>
 
+      <div class="container detail-body">
+      <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
+      <div class="detail-top detail-grid">
+        <!-- COLUMNA PRINCIPAL IZQUIERDA -->
+        <div class="detail-main">
           <p class="detail-description">{{ event.description }}</p>
 
           <!-- Ficha técnica del evento -->
@@ -382,7 +406,6 @@ onBeforeUnmount(() => {
                 outlined
                 type="textarea"
                 rows="3"
-                bg-color="white"
                 label="Cuéntanos qué fue lo que más te gustó (opcional)"
                 maxlength="1000"
                 counter
@@ -498,7 +521,7 @@ onBeforeUnmount(() => {
               no-caps
               color="primary"
               icon="confirmation_number"
-              class="full-width booking-cta"
+              class="full-width booking-cta btn-buy"
               :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
               :disable="isSoldOut"
               @click="handleBuyAction"
@@ -520,11 +543,203 @@ onBeforeUnmount(() => {
           />
         </div>
       </section>
+      </div>
+
+      <!-- BARRA DE COMPRA FIJA EN MÓVIL: precio y botón siempre a mano -->
+      <div v-if="!isClosedForSale" class="buybar" role="region" aria-label="Comprar entrada">
+        <div class="buybar__price">
+          <small>Entrada</small>
+          <strong>{{ event.price === 0 ? 'Gratis' : money(event.price, event.currency) }}</strong>
+        </div>
+        <q-btn
+          unelevated
+          rounded
+          no-caps
+          color="primary"
+          icon="confirmation_number"
+          class="buybar__cta btn-buy"
+          :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
+          :disable="isSoldOut"
+          @click="handleBuyAction"
+        />
+      </div>
     </template>
   </q-page>
 </template>
 
 <style scoped>
+/* Cabecera inmersiva */
+.detail-hero {
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  color: #ffffff;
+  background: linear-gradient(135deg, #24156b 0%, #5038b9 55%, #a8327a 100%);
+}
+
+.detail-hero__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.detail-hero.is-closed .detail-hero__bg {
+  filter: grayscale(0.6);
+}
+
+.detail-hero__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 8, 20, 0.3) 0%, rgba(10, 8, 20, 0.55) 50%, rgba(10, 8, 20, 0.92) 100%);
+}
+
+.detail-hero__content {
+  position: relative;
+  width: 100%;
+  max-width: 1190px;
+  margin: 0 auto;
+  padding: 84px 24px 30px;
+}
+
+.detail-back {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(10, 8, 20, 0.45);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.detail-back:hover,
+.detail-back:focus-visible {
+  background: rgba(10, 8, 20, 0.7);
+}
+
+.detail-hero__eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.detail-hero__title {
+  margin: 8px 0 12px;
+  max-width: 900px;
+  font-size: clamp(32px, 5.2vw, 56px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.detail-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.detail-hero__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-body {
+  padding-top: 8px;
+}
+
+.detail-body .detail-top {
+  margin-top: 20px;
+}
+
+.detail-description {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Barra de compra fija sólo en móvil */
+.buybar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .detail-hero {
+    min-height: 320px;
+  }
+  .detail-hero__content {
+    padding: 76px 16px 22px;
+  }
+  .detail-back {
+    left: 16px;
+    top: 16px;
+  }
+  .detail-page.has-buybar {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+  .buybar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -10px 24px -14px rgba(0, 0, 0, 0.4);
+  }
+  .buybar__price {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .buybar__price small {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .buybar__price strong {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-primary);
+  }
+  .buybar__cta {
+    min-height: 48px;
+    padding: 0 22px;
+    font-weight: 800;
+  }
+}
+
 .detail-grid {
   align-items: start;
 }
@@ -543,7 +758,7 @@ onBeforeUnmount(() => {
 .section-card-title {
   font-size: 19px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--text-primary);
   margin: 0 0 14px;
 }
 
@@ -579,21 +794,23 @@ onBeforeUnmount(() => {
 }
 
 .archive-finished {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .archive-cancelled {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #dc2626;
 }
 
 .archive-stat-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 6px;
@@ -607,15 +824,15 @@ onBeforeUnmount(() => {
   gap: 16px;
   flex-wrap: wrap;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--line, #e5e7eb);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .rating-summary-pill {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   padding: 10px 16px;
   border-radius: 14px;
 }
@@ -623,7 +840,7 @@ onBeforeUnmount(() => {
 .rating-big {
   font-size: 28px;
   font-weight: 800;
-  color: var(--ink, #111827);
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -640,7 +857,7 @@ onBeforeUnmount(() => {
 }
 
 .star-off {
-  color: #cbd5e1;
+  color: var(--border-color);
 }
 
 .reviews-list {
@@ -651,8 +868,8 @@ onBeforeUnmount(() => {
 }
 
 .review-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 16px;
 }
@@ -675,8 +892,8 @@ onBeforeUnmount(() => {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #ede9fe;
-  color: #5b21b6;
+  background: rgba(124, 92, 245, 0.16);
+  color: var(--brand);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -685,23 +902,23 @@ onBeforeUnmount(() => {
 .review-author__name {
   font-weight: 700;
   font-size: 14px;
-  color: var(--ink, #111827);
+  color: var(--text-primary);
 }
 
 .review-card__body {
   margin: 0;
   font-size: 14.5px;
   line-height: 1.5;
-  color: #334155;
+  color: var(--text-primary);
 }
 
 .reviewed-banner {
   margin-top: 20px;
   padding: 14px 18px;
   border-radius: 14px;
-  background: #ecfdf5;
-  border: 1px solid #bbf7d0;
-  color: #14532d;
+  background: rgba(18, 163, 114, 0.12);
+  border: 1px solid rgba(18, 163, 114, 0.35);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -711,8 +928,8 @@ onBeforeUnmount(() => {
   margin-top: 20px;
   padding: 20px;
   border-radius: 16px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
 }
 
 .review-composer__head {

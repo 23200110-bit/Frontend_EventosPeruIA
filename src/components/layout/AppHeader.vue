@@ -1,11 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { session, signOut } from '@/stores/authStore'
+import { THEME_OPTIONS, themeChoice, setTheme } from '@/utils/themeManager'
 
 const route = useRoute()
 const router = useRouter()
 const menu = ref(false)
+
+const currentTheme = computed(() => themeChoice.value)
+
+const themeIcon = computed(() => {
+  if (currentTheme.value === THEME_OPTIONS.DARK) return 'dark_mode'
+  if (currentTheme.value === THEME_OPTIONS.LIGHT) return 'light_mode'
+  return 'brightness_auto'
+})
 
 function logout() {
   menu.value = false
@@ -59,6 +68,49 @@ function logout() {
           <router-link to="/registro" active-class="nav-pill-active">Crear cuenta</router-link>
         </template>
       </nav>
+
+      <!-- SELECTOR DE TEMA -->
+      <div class="theme-selector">
+        <q-btn flat round :icon="themeIcon" aria-label="Cambiar tema" class="theme-btn">
+        <q-menu anchor="bottom right" self="top right" :offset="[0, 8]" auto-close>
+          <q-list style="min-width: 150px">
+            <q-item
+              clickable
+              v-ripple
+              :active="currentTheme === THEME_OPTIONS.SYSTEM"
+              @click="setTheme(THEME_OPTIONS.SYSTEM)"
+            >
+              <q-item-section avatar>
+                <q-icon name="brightness_auto" />
+              </q-item-section>
+              <q-item-section>Sistema</q-item-section>
+            </q-item>
+            <q-item
+              clickable
+              v-ripple
+              :active="currentTheme === THEME_OPTIONS.LIGHT"
+              @click="setTheme(THEME_OPTIONS.LIGHT)"
+            >
+              <q-item-section avatar>
+                <q-icon name="light_mode" />
+              </q-item-section>
+              <q-item-section>Claro</q-item-section>
+            </q-item>
+            <q-item
+              clickable
+              v-ripple
+              :active="currentTheme === THEME_OPTIONS.DARK"
+              @click="setTheme(THEME_OPTIONS.DARK)"
+            >
+              <q-item-section avatar>
+                <q-icon name="dark_mode" />
+              </q-item-section>
+              <q-item-section>Oscuro</q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+        </q-btn>
+      </div>
 
       <!-- ACCIONES DE CUENTA CON SESIÓN -->
       <template v-if="session.user">

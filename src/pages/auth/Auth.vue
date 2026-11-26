@@ -215,7 +215,7 @@ async function submit() {
 
 <style scoped>
 .auth-google { margin-top: 16px; }
-.auth-divider { display: flex; align-items: center; gap: 12px; color: #6b6585; font-size: 13px; margin-bottom: 14px; }
-.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: #e3e0ef; }
+.auth-divider { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
 .auth-google-btn { display: flex; justify-content: center; min-height: 44px; }
 </style>

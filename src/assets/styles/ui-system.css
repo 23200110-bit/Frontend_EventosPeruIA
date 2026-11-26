@@ -1,0 +1,504 @@
+/* UI System: Shared component styles and modern design patterns.
+   Import this AFTER style.css and experience.css in main.js.
+   Color palette uses CSS variables: --bg-primary, --text-primary, --brand, etc.
+   Supports both light and dark modes automatically.
+*/
+
+/* ---- Refined Input Fields ---- */
+.q-field--outlined .q-field__control {
+  border-radius: 10px;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.q-field--outlined.q-field--focused .q-field__control {
+  border-color: var(--brand) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 20%, transparent) !important;
+}
+
+/* ---- Buttons: Modern rounded style ---- */
+.q-btn {
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.q-btn--primary:not(.q-btn--flat):not(.q-btn--disable):not(.q-btn--loading) {
+  background: var(--brand) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+.q-btn--primary:not(.q-btn--flat):not(.q-btn--disable):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--brand) 40%, transparent);
+}
+
+.q-btn--primary:not(.q-btn--flat):not(.q-btn--disable):active {
+  transform: translateY(0);
+}
+
+.q-btn.rounded-full {
+  border-radius: 999px;
+}
+
+/* ---- Typography Utility ---- */
+.text-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+/* ---- Surfaces and Cards ---- */
+.surface-elevated {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+
+.surface-elevated:hover {
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--text-primary) 8%, transparent);
+  border-color: var(--brand);
+}
+
+/* ---- Status Badges: Soft, modern pill style ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.badge-success {
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: color-mix(in srgb, var(--warning) 15%, transparent);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: var(--danger);
+}
+
+.badge-info {
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  color: var(--brand);
+}
+
+/* ---- Responsive Grid ---- */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .grid-auto-fit {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+}
+
+.empty-state__icon {
+  font-size: 48px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.empty-state__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.empty-state__description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+/* ---- Loading Spinner ---- */
+.spinner-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+}
+
+/* ---- Divider ---- */
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 20px 0;
+}
+
+.divider-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 20px 0;
+}
+
+.divider-label::before,
+.divider-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+/* ---- Utility: Respect motion preferences ---- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Focus visible for accessibility ---- */
+.q-btn:focus-visible,
+.q-field:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ---- Utility classes for spacing ---- */
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+
+.p-sm { padding: 8px; }
+.p-md { padding: 16px; }
+.p-lg { padding: 24px; }
+
+.m-auto { margin: auto; }
+
+/* ---- Stacked form layout ---- */
+.form-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .form-horizontal {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Header pill navigation ---- */
+.nav-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 6px;
+  border-radius: 999px;
+}
+
+.nav-pill {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13.5px;
+  transition: all 0.2s ease;
+}
+
+.nav-pill:hover {
+  color: var(--text-primary);
+}
+
+.nav-pill--active {
+  background: var(--bg-primary);
+  color: var(--brand);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+
+/* ---- Tables responsive ---- */
+.q-table {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.q-table thead th {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 700;
+  border-color: var(--border-color);
+}
+
+.q-table tbody tr {
+  border-color: var(--border-color);
+  transition: background-color 0.15s ease;
+}
+
+.q-table tbody tr:hover {
+  background: color-mix(in srgb, var(--brand) 5%, transparent);
+}
+
+.q-table td {
+  color: var(--text-primary);
+}
+
+/* ---- Dialog/Modal backdrop ---- */
+.q-dialog__backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.q-card {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* ---- Select/Dropdown ---- */
+.q-menu {
+  background: var(--bg-primary);
+  box-shadow: 0 10px 40px color-mix(in srgb, var(--text-primary) 15%, transparent);
+}
+
+.q-item {
+  color: var(--text-primary);
+}
+
+.q-item:hover {
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+}
+
+/* ---- Banner/Alert ---- */
+.q-banner {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.q-banner.error {
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.q-banner.success {
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.q-banner.warning {
+  background: color-mix(in srgb, var(--warning) 15%, transparent);
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+/* ---- Spinner/Loading ---- */
+.q-spinner {
+  color: var(--brand);
+}
+
+/* ---- Transitions ---- */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* ---- Encabezado en modo oscuro (experience.css lo fija en blanco) ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .topbar {
+    background: #15131f;
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+  :root:not([data-theme="light"]) .brand-peru { color: #e8b264; }
+  :root:not([data-theme="light"]) .brand small { border-color: var(--border-color); }
+  :root:not([data-theme="light"]) .desktop-nav a,
+  :root:not([data-theme="light"]) .mobile-links a { color: #d9d0ff; }
+  :root:not([data-theme="light"]) .desktop-nav a.nav-pill-active,
+  :root:not([data-theme="light"]) .mobile-links a.nav-pill-active {
+    background: rgba(124, 92, 245, 0.28);
+    color: #ffffff;
+    box-shadow: none;
+  }
+  :root:not([data-theme="light"]) .mobile-links { background: #15131f; }
+}
+
+:root[data-theme="dark"] .topbar {
+  background: #15131f;
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+:root[data-theme="dark"] .brand-peru { color: #e8b264; }
+:root[data-theme="dark"] .brand small { border-color: var(--border-color); }
+:root[data-theme="dark"] .desktop-nav a,
+:root[data-theme="dark"] .mobile-links a { color: #d9d0ff; }
+:root[data-theme="dark"] .desktop-nav a.nav-pill-active,
+:root[data-theme="dark"] .mobile-links a.nav-pill-active {
+  background: rgba(124, 92, 245, 0.28);
+  color: #ffffff;
+  box-shadow: none;
+}
+:root[data-theme="dark"] .mobile-links { background: #15131f; }
+
+/* ---- Tarjetas .surface en modo oscuro: separarlas del fondo ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .surface,
+  :root:not([data-theme="light"]) .empty {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+  }
+}
+:root[data-theme="dark"] .surface,
+:root[data-theme="dark"] .empty {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+/* ---- Login/registro y botón de usuario activo en modo oscuro ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .q-page.auth-page,
+  :root:not([data-theme="light"]) .auth-page {
+    background: var(--bg-primary);
+  }
+  :root:not([data-theme="light"]) .topbar .q-btn.nav-pill-active {
+    background: rgba(124, 92, 245, 0.28);
+    color: #ffffff;
+    box-shadow: none;
+  }
+}
+:root[data-theme="dark"] .q-page.auth-page,
+:root[data-theme="dark"] .auth-page {
+  background: var(--bg-primary);
+}
+:root[data-theme="dark"] .topbar .q-btn.nav-pill-active {
+  background: rgba(124, 92, 245, 0.28);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* ---- Pestañas de los paneles (admin/organizador) en modo oscuro ---- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .panel-page .q-tab:not(.q-tab--active) {
+    background: var(--bg-secondary);
+    color: #d9d0ff;
+    box-shadow: inset 0 0 0 1px var(--border-color);
+  }
+}
+:root[data-theme="dark"] .panel-page .q-tab:not(.q-tab--active) {
+  background: var(--bg-secondary);
+  color: #d9d0ff;
+  box-shadow: inset 0 0 0 1px var(--border-color);
+}
+
+/* ---- Tanda 3: acento de compra y escala tipográfica ----
+   --buy es el color SÓLO para comprar y precios destacados. El violeta (--brand) queda como marca.
+   Contraste medido: claro #d63c2f con texto blanco 4.62:1, oscuro #ff7a66 con texto #1a0f0d 7.36:1. */
+:root {
+  --buy: #d63c2f;
+  --buy-hover: #b93226;
+  --buy-text: #ffffff;
+  --fs-card-title: 17px;
+  --fs-card-meta: 13px;
+  --fs-price: 16px;
+  --fs-section: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --buy: #ff7a66;
+    --buy-hover: #ff9580;
+    --buy-text: #1a0f0d;
+  }
+}
+
+:root[data-theme="dark"] {
+  --buy: #ff7a66;
+  --buy-hover: #ff9580;
+  --buy-text: #1a0f0d;
+}
+
+.btn-buy.q-btn {
+  background: var(--buy) !important;
+  color: var(--buy-text) !important;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 22px -12px var(--buy);
+}
+
+.btn-buy.q-btn:hover {
+  background: var(--buy-hover) !important;
+}
+
+.btn-buy.q-btn.disabled,
+.btn-buy.q-btn[disabled] {
+  background: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  box-shadow: none;
+}

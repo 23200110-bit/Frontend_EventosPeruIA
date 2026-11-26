@@ -119,6 +119,24 @@ onMounted(() => {
   padding: 6px;
   border-radius: 999px;
   margin-bottom: 28px;
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .tickets-filter-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-radius: 18px;
+  }
+  .tickets-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .tickets-pill {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 }
 
 .tickets-pill {
@@ -137,9 +155,9 @@ onMounted(() => {
 }
 
 .tickets-pill--active {
-  background: #ffffff;
-  color: var(--ink);
-  box-shadow: 0 2px 10px #231b3c18;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
 
 .tickets-list {

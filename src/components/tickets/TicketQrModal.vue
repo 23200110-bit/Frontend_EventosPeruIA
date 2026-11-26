@@ -266,15 +266,16 @@ async function handleDownload() {
   width: 100%;
   border-radius: 24px;
   overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 24px 60px rgba(15, 12, 41, 0.45);
+  background: var(--bg-primary);
+  box-shadow: 0 24px 60px color-mix(in srgb, var(--text-primary) 20%, transparent);
+  color: var(--text-primary);
 }
 
 .voucher-ticket__head {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #3c289e 0%, #5239c2 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+  color: white;
   padding: 24px 26px 22px;
 }
 
@@ -346,7 +347,7 @@ async function handleDownload() {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #171332;
+  background: var(--bg-primary);
   position: absolute;
 }
 
@@ -383,21 +384,21 @@ async function handleDownload() {
 }
 
 .voucher-status--valid {
-  background: #dcfce7;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: color-mix(in srgb, var(--success) 50%, var(--text-primary));
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
 }
 
 .voucher-status--used {
-  background: var(--wash);
-  color: var(--muted-ink);
-  border: 1px solid var(--line);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .voucher-status--canceled {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
 }
 
 .voucher-ticket__refund {
@@ -405,9 +406,9 @@ async function handleDownload() {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #991b1b;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
   padding: 10px 14px;
   border-radius: 14px;
   font-size: 12.5px;
@@ -427,10 +428,10 @@ async function handleDownload() {
 
 .voucher-ticket__qr-frame {
   padding: 14px;
-  background: #ffffff;
-  border: 1px solid var(--line);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 22px;
-  box-shadow: 0 8px 24px rgba(35, 27, 60, 0.06);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 5%, transparent);
 }
 
 .voucher-ticket__qr-frame img {
@@ -439,8 +440,8 @@ async function handleDownload() {
 
 .voucher-ticket__qr-disabled {
   width: 100%;
-  background: var(--wash);
-  border: 1.5px dashed #cfc1ed;
+  background: var(--bg-secondary);
+  border: 1.5px dashed var(--border-color);
   border-radius: 18px;
   padding: 24px 16px;
   text-align: center;
@@ -448,7 +449,7 @@ async function handleDownload() {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  color: var(--muted-ink);
+  color: var(--text-secondary);
 }
 
 .voucher-ticket__qr-disabled strong {
@@ -471,8 +472,8 @@ async function handleDownload() {
 
 .voucher-ticket__hint-box {
   width: 100%;
-  background: #eef2ff;
-  border: 1px solid #e0e7ff;
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent);
   border-radius: 16px;
   padding: 12px 16px;
   text-align: center;
@@ -483,12 +484,12 @@ async function handleDownload() {
 
 .voucher-ticket__hint-box strong {
   font-size: 13px;
-  color: #3730a3;
+  color: var(--brand);
 }
 
 .voucher-ticket__hint-box span {
   font-size: 12px;
-  color: var(--brand);
+  color: var(--text-secondary);
 }
 
 .voucher-ticket__info-grid {
@@ -499,8 +500,8 @@ async function handleDownload() {
 }
 
 .voucher-ticket__info-card {
-  background: #f8f7fc;
-  border: 1px solid var(--line);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 12px 14px;
   text-align: center;
@@ -511,25 +512,25 @@ async function handleDownload() {
 
 .voucher-ticket__info-card small {
   font-size: 12px;
-  color: var(--muted-ink);
+  color: var(--text-secondary);
 }
 
 .voucher-ticket__info-card strong {
   font-size: 14px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--text-primary);
 }
 
 .voucher-ticket__foot {
-  background: #f8f7fc;
-  border-top: 1px solid var(--line);
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
   padding: 12px 22px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   font-size: 11.5px;
-  color: var(--muted-ink);
+  color: var(--text-secondary);
 }
 
 .voucher-ticket__foot a {

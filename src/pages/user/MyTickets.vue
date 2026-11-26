@@ -1,11 +1,15 @@
 <script setup>
-import { onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import TicketCard from '@/components/tickets/TicketCard.vue'
 import TicketQrModal from '@/components/tickets/TicketQrModal.vue'
+import { eventService } from '@/services/eventService'
+import { session } from '@/stores/authStore'
 import { useTicketStore } from '@/stores/ticketStore'
 
 const { state, counts, filteredItems, fetchMyTickets, openVoucher, closeVoucher, setTab } =
   useTicketStore()
+
+const reviewedEventIds = ref(new Set())
 
 const tabs = [
   { key: 'todas', label: 'Todas' },
@@ -13,6 +17,48 @@ const tabs = [
   { key: 'utilizadas', label: 'Utilizadas' },
   { key: 'canceladas', label: 'Canceladas' }
 ]
+
+const currentUserId = computed(() => Number(session.user?.userId || session.user?.id || 0))
+
+async function checkReviewedEvents(tickets) {
+  if (!currentUserId.value || !Array.isArray(tickets) || !tickets.length) {
+    reviewedEventIds.value = new Set()
+    return
+  }
+
+  const usedEventIds = [
+    ...new Set(
+      tickets
+        .filter((t) => (t.estado || '').toLowerCase().trim() === 'utilizada')
+        .map((t) => Number(t.eventoId))
+        .filter((id) => Number.isFinite(id) && id > 0)
+    )
+  ]
+
+  const reviewed = new Set()
+  await Promise.all(
+    usedEventIds.map(async (evId) => {
+      try {
+        const summary = await eventService.getEventReviews(evId)
+        const already = (summary?.reviews || []).some(
+          (r) => Number(r.userId) === currentUserId.value
+        )
+        if (already) reviewed.add(evId)
+      } catch {
+        // Ignora errores individuales al consultar resumen
+      }
+    })
+  )
+  reviewedEventIds.value = reviewed
+}
+
+watch(
+  () => state.items,
+  (newItems) => {
+    checkReviewedEvents(newItems)
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
   fetchMyTickets()
@@ -75,6 +121,7 @@ onMounted(() => {
         <TicketCard
           :ticket="item"
           :loading="state.loadingVoucherId === item.entradaId"
+          :already-reviewed="reviewedEventIds.has(Number(item.eventoId))"
           @select="openVoucher"
         />
       </div>

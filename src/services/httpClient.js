@@ -7,6 +7,7 @@ export async function api(path, { timeoutMs = 15000, responseType = 'json', ...o
   const requestUser = session.user
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
+  let reached = false
 
   try {
     const response = await fetch(BASE_URL + path, {
@@ -19,6 +20,7 @@ export async function api(path, { timeoutMs = 15000, responseType = 'json', ...o
       }
     })
 
+    reached = true
     if (response.ok && responseType === 'blob') {
       return await response.blob()
     }
@@ -55,7 +57,14 @@ export async function api(path, { timeoutMs = 15000, responseType = 'json', ...o
     return data
   } catch (error) {
     if (error.name === 'AbortError') {
-      throw new Error('La API tardó demasiado. Intenta nuevamente.')
+      const late = new Error('No pudimos conectar a tiempo. Verifica tu conexión e inténtalo otra vez.')
+      late.kind = 'timeout'
+      throw late
+    }
+    if (error instanceof TypeError && !reached) {
+      const offline = new Error('No pudimos conectar con el servidor. Verifica tu conexión e inténtalo otra vez.')
+      offline.kind = 'network'
+      throw offline
     }
     throw error
   } finally {

@@ -165,8 +165,8 @@ const showAlreadyReviewed = computed(
 <style scoped>
 .ticket-card {
   display: flex;
-  background: #fff;
-  border: 1px solid var(--line);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 18px;
   overflow: hidden;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
@@ -174,15 +174,15 @@ const showAlreadyReviewed = computed(
 
 .ticket-card:hover {
   transform: translateY(-2px);
-  border-color: #cfc1ed;
-  box-shadow: 0 12px 26px #231b3c12;
+  border-color: var(--brand);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
 
 .ticket-card__cover {
   width: 215px;
   min-height: 170px;
   flex-shrink: 0;
-  background: #ede4ff;
+  background: var(--bg-tertiary);
 }
 
 .ticket-card__cover img {
@@ -257,29 +257,30 @@ const showAlreadyReviewed = computed(
 }
 
 .ticket-badge--valid {
-  background: #e1f7ea;
-  color: #157a44;
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: color-mix(in srgb, var(--success) 50%, var(--text-primary));
 }
 
 .ticket-badge--used {
-  background: var(--wash);
-  color: var(--muted-ink);
+  background: color-mix(in srgb, var(--text-secondary) 10%, transparent);
+  color: var(--text-secondary);
 }
 
 .ticket-badge--canceled {
-  background: #f9e5e1;
-  color: #8e2f20;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
 }
 
 .ticket-card__alert {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #f9e5e1;
-  color: #8e2f20;
+  background: color-mix(in srgb, var(--danger) 15%, transparent);
+  color: color-mix(in srgb, var(--danger) 50%, var(--text-primary));
   padding: 8px 12px;
   border-radius: 10px;
   font-size: 12.5px;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
 }
 
 .ticket-card__bottom {
@@ -292,9 +293,9 @@ const showAlreadyReviewed = computed(
 }
 
 .ticket-code {
-  background: var(--wash);
-  color: var(--ink);
-  border: 1px solid var(--line);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   padding: 5px 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -312,20 +313,29 @@ const showAlreadyReviewed = computed(
 }
 
 .ticket-card__btn {
-  background: var(--wash);
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
   color: var(--brand);
   border-radius: 999px;
   padding: 6px 16px;
   font-weight: 700;
+  transition: all 0.2s ease;
 }
 
-/* [AGREGADO HU-13] Estilo del botón Reseñar evento */
+.ticket-card__btn:hover {
+  background: color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
 .ticket-card__review-btn {
-  background: #fff4d6;
-  color: #8a5a00;
+  background: color-mix(in srgb, var(--warning) 15%, transparent);
+  color: color-mix(in srgb, var(--warning) 50%, var(--text-primary));
   border-radius: 999px;
   padding: 6px 16px;
   font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.ticket-card__review-btn:hover {
+  background: color-mix(in srgb, var(--warning) 25%, transparent);
 }
 
 /* [AGREGADO HU-13] Estilo de insignia/botón cuando ya reseñaste */

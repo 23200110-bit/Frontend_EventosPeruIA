@@ -26,7 +26,18 @@ const TABS = [
   'Cancelado'
 ]
 
+function isEventConcluded(ev) {
+  const st = (ev.estado || '').toLowerCase()
+  if (st.includes('final')) return true
+  if (st.includes('cancel') || st.includes('borrador')) return false
+  const rawEnd = ev.fechaFin || ev.fechaInicio
+  if (!rawEnd) return false
+  const endDate = new Date(rawEnd)
+  return !Number.isNaN(endDate.getTime()) && endDate < new Date()
+}
+
 function isPendingReview(ev) {
+  if (isEventConcluded(ev)) return false
   const st = (ev.estado || '').toLowerCase()
   const mod = (ev.estadoModeracion || '').toLowerCase()
   return st.includes('public') && mod === 'pendienterevision'
@@ -35,14 +46,16 @@ function isPendingReview(ev) {
 const kpis = computed(() => {
   const total = events.value.length
   const published = events.value.filter(
-    (e) => (e.estado || '').toLowerCase().includes('public') && !isPendingReview(e)
+    (e) =>
+      (e.estado || '').toLowerCase().includes('public') &&
+      !isPendingReview(e) &&
+      !isEventConcluded(e)
   ).length
   const ticketsSold = events.value.reduce(
     (acc, e) => acc + Number(e.ticketsVendidos ?? 0),
     0
   )
   const revenue = events.value.reduce(
-    // Ingreso real cobrado (lo que pagó cada comprador); no depende del precio actual del evento.
     (acc, e) => acc + Number(e.ingresosTotales ?? 0),
     0
   )
@@ -54,9 +67,12 @@ const tabCounts = computed(() => ({
   Borrador: events.value.filter((e) => (e.estado || '').toLowerCase().includes('borrador')).length,
   'Pendiente de revisión': events.value.filter((e) => isPendingReview(e)).length,
   Publicado: events.value.filter(
-    (e) => (e.estado || '').toLowerCase().includes('public') && !isPendingReview(e)
+    (e) =>
+      (e.estado || '').toLowerCase().includes('public') &&
+      !isPendingReview(e) &&
+      !isEventConcluded(e)
   ).length,
-  Finalizado: events.value.filter((e) => (e.estado || '').toLowerCase().includes('final')).length,
+  Finalizado: events.value.filter((e) => isEventConcluded(e)).length,
   Cancelado: events.value.filter((e) => (e.estado || '').toLowerCase().includes('cancel')).length
 }))
 
@@ -70,13 +86,14 @@ const filteredEvents = computed(() => {
 
     const st = (ev.estado || '').toLowerCase()
     const pending = isPendingReview(ev)
+    const concluded = isEventConcluded(ev)
 
     const matchesTab =
       activeTab.value === 'Todos' ||
       (activeTab.value === 'Borrador' && st.includes('borrador')) ||
       (activeTab.value === 'Pendiente de revisión' && pending) ||
-      (activeTab.value === 'Publicado' && st.includes('public') && !pending) ||
-      (activeTab.value === 'Finalizado' && st.includes('final')) ||
+      (activeTab.value === 'Publicado' && st.includes('public') && !pending && !concluded) ||
+      (activeTab.value === 'Finalizado' && concluded) ||
       (activeTab.value === 'Cancelado' && st.includes('cancel'))
 
     return matchesText && matchesTab
@@ -89,7 +106,8 @@ function openCancelModal(ev) {
 }
 
 async function handleEventCanceled() {
-  successBanner.value = 'El evento ha sido cancelado correctamente y se notificó a los asistentes afectados.'
+  successBanner.value =
+    'El evento ha sido cancelado correctamente y se notificó a los asistentes afectados.'
   await loadMyEvents()
 }
 
@@ -111,7 +129,6 @@ onMounted(loadMyEvents)
 
 <template>
   <q-page class="container">
-    <!-- Cabecera -->
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
       <div>
         <div class="eyebrow">PANEL DE ORGANIZADOR</div>
@@ -142,7 +159,6 @@ onMounted(loadMyEvents)
       </div>
     </div>
 
-    <!-- 4 Tarjetas KPI -->
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
       <div class="surface" style="border-radius: 16px; padding: 18px;">
         <q-icon name="festival" color="primary" size="26px" />
@@ -157,7 +173,7 @@ onMounted(loadMyEvents)
         <div style="font-size: 1.7rem; font-weight: 700; color: #16a34a; margin-top: 8px;">
           {{ kpis.published }}
         </div>
-        <div class="muted">Publicados</div>
+        <div class="muted">Publicados activos</div>
       </div>
 
       <div class="surface" style="border-radius: 16px; padding: 18px;">
@@ -177,7 +193,6 @@ onMounted(loadMyEvents)
       </div>
     </div>
 
-    <!-- Buscador + Pestañas de estado -->
     <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
       <q-input
         v-model="searchQuery"
@@ -240,7 +255,6 @@ onMounted(loadMyEvents)
       />
     </div>
 
-    <!-- Modal de Cancelación (US-009) -->
     <CancelEventDialog
       v-model="cancelDialogOpen"
       :event="eventToCancel"

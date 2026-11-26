@@ -15,33 +15,46 @@ const progressRatio = computed(() =>
   totalCapacity.value > 0 ? Math.min(soldCount.value / totalCapacity.value, 1) : 0
 )
 
+const isConcluded = computed(() => {
+  const st = (props.event.estado || '').toLowerCase()
+  if (st.includes('final')) return true
+  if (st.includes('cancel') || st.includes('borrador')) return false
+  const rawEnd = props.event.fechaFin || props.event.fechaInicio
+  if (!rawEnd) return false
+  const endDate = new Date(rawEnd)
+  return !Number.isNaN(endDate.getTime()) && endDate < new Date()
+})
+
 const isPendingReview = computed(() => {
+  if (isConcluded.value) return false
   const st = (props.event.estado || '').toLowerCase()
   const mod = (props.event.estadoModeracion || '').toLowerCase()
   return st.includes('public') && mod === 'pendienterevision'
 })
 
 const displayStatus = computed(() => {
+  if (isConcluded.value) return 'Finalizado'
   if (isPendingReview.value) return 'Pendiente de revisión'
   return props.event.estado || 'Borrador'
 })
 
 const statusColor = computed(() => {
+  if (isConcluded.value) return 'blue-grey-7'
   if (isPendingReview.value) return 'warning'
   const st = (props.event.estado || '').toLowerCase()
   if (st.includes('public')) return 'positive'
   if (st.includes('borrador')) return 'grey-7'
   if (st.includes('cancel')) return 'negative'
-  if (st.includes('final')) return 'info'
   return 'primary'
 })
 
 const canEdit = computed(() => {
   const st = (props.event.estado || '').toLowerCase()
-  return !st.includes('cancel') && !st.includes('final')
+  return !st.includes('cancel') && !isConcluded.value
 })
 
 const canCancel = computed(() => {
+  if (isConcluded.value) return false
   const st = (props.event.estado || '').toLowerCase()
   return st.includes('borrador') || st.includes('public')
 })
@@ -75,6 +88,12 @@ const canCancel = computed(() => {
               rounded
               style="padding: 4px 10px; font-weight: 600;"
             >
+              <q-icon
+                v-if="isConcluded"
+                name="event_available"
+                size="13px"
+                style="margin-right: 4px;"
+              />
               {{ displayStatus }}
             </q-badge>
           </div>
@@ -86,7 +105,6 @@ const canCancel = computed(() => {
 
       <!-- Botones de acción -->
       <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <q-btn
             round
@@ -117,12 +135,14 @@ const canCancel = computed(() => {
             round
             outline
             size="sm"
-            color="grey-8"
-            icon="group"
-            aria-label="Asistentes y Check-in"
+            :color="isConcluded ? 'blue-grey-7' : 'grey-8'"
+            :icon="isConcluded ? 'assessment' : 'group'"
+            :aria-label="isConcluded ? 'Resumen de asistencia' : 'Asistentes y Check-in'"
             @click="emit('attendees', event)"
           >
-            <q-tooltip>Asistentes / Check-in</q-tooltip>
+            <q-tooltip>
+              {{ isConcluded ? 'Ver resumen final de asistencia' : 'Asistentes / Check-in' }}
+            </q-tooltip>
           </q-btn>
 
           <q-btn
@@ -151,7 +171,7 @@ const canCancel = computed(() => {
         :value="progressRatio"
         rounded
         size="8px"
-        color="primary"
+        :color="isConcluded ? 'blue-grey-5' : 'primary'"
         track-color="grey-3"
       />
     </div>

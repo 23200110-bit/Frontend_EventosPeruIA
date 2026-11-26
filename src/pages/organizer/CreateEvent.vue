@@ -24,11 +24,27 @@ const errorMsg = ref('')
 const successMsg = ref('')
 const soldTickets = ref(0)
 
+// Bloqueo de edición si el evento ya culminó o fue cancelado
+const isEventLocked = computed(() => {
+  if (!isEditMode.value || !originalEvent.value) return false
+  const st = (originalEvent.value.estado || '').toLowerCase()
+  if (st.includes('cancel') || st.includes('final')) return true
+  if (st.includes('borrador')) return false
+  const rawEnd = originalEvent.value.fechaFin || originalEvent.value.fechaInicio
+  if (!rawEnd) return false
+  const endDate = new Date(rawEnd)
+  return !Number.isNaN(endDate.getTime()) && endDate < new Date()
+})
+
 // Estado para subida de imagen a Supabase Storage
 const imageFile = ref(null)
 const uploadingImage = ref(false)
 const saveBlocked = computed(
-  () => saving.value || uploadingImage.value || Boolean(successMsg.value) ||
+  () =>
+    saving.value ||
+    uploadingImage.value ||
+    Boolean(successMsg.value) ||
+    isEventLocked.value ||
     (isEditMode.value && !originalEvent.value)
 )
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
@@ -87,7 +103,6 @@ async function onImageSelected(file) {
   }
 }
 
-// Borrador sugerido desde un flyer: solo rellena lo detectado; nada se guarda hasta que la persona lo decida.
 const draftNotice = ref('')
 const normalize = (text) =>
   String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
@@ -97,7 +112,6 @@ function applyDraft({ draft, file }) {
   const filled = []
   const missing = []
   const has = (value) => value !== null && value !== undefined && value !== ''
-  // Un dato que no está en el flyer se deja en blanco (no se conservan valores por defecto).
   const set = (label, value, apply, blank) => {
     if (has(value)) {
       apply(value)
@@ -146,7 +160,6 @@ const lastFlyerFile = ref(null)
 const COVER_OK = ' Portada: el flyer se cargó como imagen del evento.'
 const COVER_FAIL = ' No se pudo cargar el flyer como portada: '
 
-// Sube el flyer como portada y lo informa en el aviso (si falla, se ve junto al flyer).
 async function uploadFlyerAsCover(file) {
   draftNotice.value = draftNotice.value.split(COVER_OK)[0].split(COVER_FAIL)[0]
   await onImageSelected(file)
@@ -154,7 +167,6 @@ async function uploadFlyerAsCover(file) {
   else draftNotice.value += COVER_FAIL + (errorMsg.value || 'error desconocido.')
 }
 
-// Si se marca la casilla después de analizar el flyer, también se aplica.
 watch(useAsCover, (on) => {
   if (on && lastFlyerFile.value && !uploadingImage.value) void uploadFlyerAsCover(lastFlyerFile.value)
 })
@@ -344,6 +356,18 @@ onMounted(init)
       </p>
     </div>
 
+    <q-banner
+      v-if="isEventLocked"
+      rounded
+      class="bg-blue-grey-8 text-white"
+      style="margin-bottom: 16px;"
+    >
+      <template #avatar>
+        <q-icon name="lock" />
+      </template>
+      Este evento ya finalizó o fue cancelado, por lo que su edición se encuentra cerrada (solo lectura).
+    </q-banner>
+
     <q-banner v-if="errorMsg" class="error" role="alert" style="margin-bottom: 16px;">
       {{ errorMsg }}
     </q-banner>
@@ -395,6 +419,7 @@ onMounted(init)
           <q-input
             v-model="form.nombre"
             outlined
+            :disable="isEventLocked"
             label="Nombre del evento *"
             placeholder="Ej. Festival Lima Sound 2026"
             :rules="[required, maxLengthRule(150)]"
@@ -405,6 +430,7 @@ onMounted(init)
             outlined
             emit-value
             map-options
+            :disable="isEventLocked"
             :options="categories"
             label="Categoría *"
             :rules="[(v) => !!v || 'Selecciona una categoría.']"
@@ -417,6 +443,7 @@ onMounted(init)
           outlined
           type="textarea"
           rows="4"
+          :disable="isEventLocked"
           label="Descripción del evento *"
           placeholder="Describe la experiencia, artistas invitados, cronograma o recomendaciones..."
           :rules="[required]"
@@ -428,6 +455,7 @@ onMounted(init)
             v-model="form.fechaInicio"
             outlined
             type="date"
+            :disable="isEventLocked"
             label="Fecha de inicio *"
             stack-label
             :rules="[required]"
@@ -436,6 +464,7 @@ onMounted(init)
             v-model="form.horaInicio"
             outlined
             type="time"
+            :disable="isEventLocked"
             label="Hora de inicio *"
             stack-label
             :rules="[required]"
@@ -444,6 +473,7 @@ onMounted(init)
             v-model="form.fechaFin"
             outlined
             type="date"
+            :disable="isEventLocked"
             label="Fecha de fin (opcional)"
             stack-label
           />
@@ -451,6 +481,7 @@ onMounted(init)
             v-model="form.horaFin"
             outlined
             type="time"
+            :disable="isEventLocked"
             label="Hora de fin (opcional)"
             stack-label
           />
@@ -461,6 +492,7 @@ onMounted(init)
           <q-input
             v-model="form.ciudad"
             outlined
+            :disable="isEventLocked"
             label="Ciudad *"
             placeholder="Ej. Lima"
             :rules="[required, maxLengthRule(100)]"
@@ -468,12 +500,14 @@ onMounted(init)
           <q-input
             v-model="form.nombreLugar"
             outlined
+            :disable="isEventLocked"
             label="Nombre del recinto / local"
             placeholder="Ej. Arena 1 - Costa Verde"
           />
           <q-input
             v-model="form.direccion"
             outlined
+            :disable="isEventLocked"
             label="Dirección exacta *"
             placeholder="Ej. Circuito de Playas s/n, San Miguel"
             :rules="[required, maxLengthRule(250)]"
@@ -488,6 +522,7 @@ onMounted(init)
             type="number"
             min="1"
             step="1"
+            :disable="isEventLocked"
             label="Aforo total (cupos) *"
             :hint="isEditMode && soldTickets > 0 ? `Mínimo permitido: ${soldTickets} (ya vendidas)` : ''"
             :rules="[capacityRule]"
@@ -500,12 +535,13 @@ onMounted(init)
             min="0"
             step="0.5"
             prefix="S/"
+            :disable="isEventLocked"
             label="Precio de entrada (0 = Gratis) *"
             :rules="[nonNegativeNumberRule]"
           />
         </div>
 
-        <!-- Imagen de portada (Subir archivo a Supabase Storage o pegar URL) -->
+        <!-- Imagen de portada -->
         <div style="display: grid; gap: 12px; padding: 16px; border: 1px dashed #cbd5e1; border-radius: 14px; background: #f8fafc;">
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
             <q-file
@@ -516,7 +552,7 @@ onMounted(init)
               max-file-size="5242880"
               label="Subir imagen desde tu dispositivo (máx. 5 MB)"
               :loading="uploadingImage"
-              :disable="uploadingImage || saving"
+              :disable="uploadingImage || saving || isEventLocked"
               @update:model-value="onImageSelected"
             >
               <template #prepend>
@@ -531,7 +567,7 @@ onMounted(init)
               bg-color="white"
               label="O pega una URL de imagen de portada"
               placeholder="https://..."
-              :disable="uploadingImage || saving"
+              :disable="uploadingImage || saving || isEventLocked"
             />
           </div>
 
@@ -554,12 +590,13 @@ onMounted(init)
             flat
             no-caps
             color="grey-8"
-            label="Cancelar"
+            :label="isEventLocked ? 'Volver a Mis eventos' : 'Cancelar'"
             :disable="saving || uploadingImage"
             @click="router.push('/organizador/mis-eventos')"
           />
 
           <q-btn
+            v-if="!isEventLocked"
             :outline="isDraft"
             :unelevated="!isDraft"
             rounded
@@ -573,7 +610,7 @@ onMounted(init)
           />
 
           <q-btn
-            v-if="isDraft"
+            v-if="isDraft && !isEventLocked"
             unelevated
             rounded
             no-caps

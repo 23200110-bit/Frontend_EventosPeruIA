@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { Html5Qrcode } from 'html5-qrcode'
 import { eventService } from '@/services/eventService'
@@ -17,6 +17,27 @@ const accessError = ref('')
 
 const checkedInCount = ref(0)
 const recentLogs = ref([])
+
+// Detecta si el evento ya finalizó o fue cancelado
+const isEventConcluded = computed(() => {
+  if (!event.value) return false
+  const st = (event.value.status || '').toLowerCase()
+  if (st.includes('final') || st.includes('cancel')) return true
+  const rawEnd = event.value.endDate || event.value.startDate
+  if (!rawEnd) return false
+  const endDate = new Date(rawEnd)
+  return !Number.isNaN(endDate.getTime()) && endDate < new Date()
+})
+
+const soldTicketsCount = computed(() => {
+  if (!event.value) return 0
+  return Math.max(0, Number(event.value.capacity ?? 0) - Number(event.value.availableSpots ?? 0))
+})
+
+const attendanceRate = computed(() => {
+  if (!soldTicketsCount.value) return 0
+  return Math.min(100, Math.round((checkedInCount.value / soldTicketsCount.value) * 100))
+})
 
 // Input exclusivo para ingreso manual (contingencia)
 const manualCode = ref('')
@@ -41,7 +62,6 @@ let html5QrCode = null
 let lastScannedCode = ''
 let lastScannedAt = 0
 
-// Pitido sutil de escáner (sin archivos externos)
 function playScannerTone(type) {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext
@@ -123,7 +143,6 @@ async function loadEventInfo() {
       accessError.value =
         'Acceso denegado: solo el organizador que administra este evento puede realizar el Check-in.'
     } else {
-      // Carga el conteo real de ingresados ("Utilizada") desde la BD
       try {
         const stats = await eventService.getEventAttendees(eventId, {
           pagina: 1,
@@ -132,7 +151,7 @@ async function loadEventInfo() {
         checkedInCount.value =
           stats?.checkInsRealizados ?? stats?.utilizadas ?? stats?.Utilizadas ?? 0
       } catch {
-        // Si falla la carga inicial, mantiene 0 y sigue sumando en vivo
+        // Mantiene 0 si falla el endpoint auxiliar
       }
     }
   } catch (e) {
@@ -143,6 +162,7 @@ async function loadEventInfo() {
 }
 
 async function startCamera() {
+  if (isEventConcluded.value) return
   cameraError.value = ''
   try {
     html5QrCode = new Html5Qrcode('qr-reader-box')
@@ -159,7 +179,6 @@ async function startCamera() {
         lastScannedCode = cleanCode
         lastScannedAt = now
 
-        // Escanea y valida directo SIN rellenar el input manual
         await processValidation(cleanCode, 'QR')
       },
       () => {}
@@ -184,6 +203,7 @@ async function stopCamera() {
 }
 
 async function processValidation(rawCode, method) {
+  if (isEventConcluded.value) return
   const code = (rawCode || '').trim()
   if (!code) {
     showFeedback(
@@ -199,7 +219,6 @@ async function processValidation(rawCode, method) {
   }
 
   busy.value = true
-  // 1. Reacción inmediata gris/neutra mientras consulta al servidor
   showFeedback(
     'scanning',
     {
@@ -227,7 +246,6 @@ async function processValidation(rawCode, method) {
     const holderName = res.titular || 'Asistente verificado'
     const validatedAt = res.fechaUso || res.fechaValidacion || new Date().toISOString()
 
-    // 2. Reacción visual verde de acceso aprobado
     showFeedback('approved', {
       title: '¡ACCESO APROBADO!',
       message: res.message || 'Entrada validada correctamente.',
@@ -251,7 +269,6 @@ async function processValidation(rawCode, method) {
   } catch (e) {
     const reason = e.message || 'Entrada inválida o ya utilizada.'
 
-    // 2. Reacción visual roja de acceso denegado
     showFeedback(
       'rejected',
       {
@@ -292,9 +309,12 @@ onBeforeUnmount(() => {
       ← Volver a gestión de asistentes
     </router-link>
 
-    <div class="eyebrow">CONTROL DE ACCESO EN PUERTA · HU-12</div>
+    <div class="eyebrow">
+      {{ isEventConcluded ? 'RESUMEN DE ASISTENCIA · EVENTO CONCLUIDO' : 'CONTROL DE ACCESO EN PUERTA · HU-12' }}
+    </div>
     <h1 class="page-heading">
-      Check-in: {{ event?.name || route.query.name || 'Cargando evento...' }}
+      {{ isEventConcluded ? 'Resumen de Check-in' : 'Check-in' }}:
+      {{ event?.name || route.query.name || 'Cargando evento...' }}
     </h1>
 
     <q-banner v-if="accessError" class="error" role="alert" style="margin-bottom: 20px;">
@@ -316,13 +336,65 @@ onBeforeUnmount(() => {
         <div v-if="event">
           <small class="muted">AFORO DEL EVENTO</small>
           <p style="margin: 4px 0 0;">
-            <strong>{{ event.capacity - event.availableSpots }}</strong> vendidos de
+            <strong>{{ soldTicketsCount }}</strong> vendidos de
             <strong>{{ event.capacity }}</strong> cupos totales
+          </p>
+        </div>
+        <div v-if="isEventConcluded">
+          <small class="muted">TASA DE ASISTENCIA</small>
+          <p style="margin: 4px 0 0; font-size: 1.15rem; font-weight: 800; color: #16a34a;">
+            {{ attendanceRate }}% de asistencia efectiva
           </p>
         </div>
       </div>
 
-      <div class="detail-top">
+      <!-- MODO RESUMEN CUANDO EL EVENTO YA CONCLUYÓ -->
+      <section
+        v-if="isEventConcluded"
+        class="surface"
+        style="padding: 28px; border-radius: 18px;"
+      >
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+          <q-icon name="event_available" size="30px" color="blue-grey-7" />
+          <div>
+            <h3 style="margin: 0; font-size: 1.2rem;">Control de puerta cerrado</h3>
+            <p class="muted" style="margin: 2px 0 0;">
+              Este evento concluyó el {{ date(event?.endDate || event?.startDate) }}, por lo que el escáner QR y el registro manual ya no están habilitados.
+            </p>
+          </div>
+        </div>
+
+        <q-linear-progress
+          :value="attendanceRate / 100"
+          rounded
+          size="10px"
+          color="positive"
+          track-color="grey-3"
+          style="margin: 16px 0;"
+        />
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px;">
+          <q-btn
+            unelevated
+            no-caps
+            color="primary"
+            icon="people"
+            label="Ver listado completo de asistentes"
+            :to="{ path: '/organizador/asistentes', query: { evento: eventId } }"
+          />
+          <q-btn
+            outline
+            no-caps
+            color="grey-8"
+            icon="arrow_back"
+            label="Volver a Mis eventos"
+            to="/organizador/mis-eventos"
+          />
+        </div>
+      </section>
+
+      <!-- MODO ESCÁNER ACTIVO CUANDO EL EVENTO SIGUE VIGENTE -->
+      <div v-else class="detail-top">
         <!-- Panel Izquierdo: Escáner de Cámara QR Real -->
         <section class="surface">
           <h3 style="margin-top: 0;">1. Escaneo con Cámara QR</h3>
@@ -367,7 +439,7 @@ onBeforeUnmount(() => {
           </q-banner>
         </section>
 
-        <!-- Panel Derecho: Ingreso Manual Alfanumérico (Independiente) -->
+        <!-- Panel Derecho: Ingreso Manual Alfanumérico -->
         <section class="surface">
           <h3 style="margin-top: 0;">2. Ingreso Manual (Contingencia)</h3>
           <p class="muted">
@@ -394,7 +466,6 @@ onBeforeUnmount(() => {
             />
           </q-form>
 
-          <!-- Último estado compacto debajo del formulario solo cuando hubo lectura -->
           <div
             v-if="recentLogs.length"
             class="last-scan-pill"
@@ -410,7 +481,7 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- Historial rápido de validaciones en puerta -->
-      <section v-if="recentLogs.length" class="surface" style="margin-top: 20px;">
+      <section v-if="recentLogs.length && !isEventConcluded" class="surface" style="margin-top: 20px;">
         <h3 style="margin-top: 0;">Últimas lecturas en puerta</h3>
         <article
           v-for="(log, idx) in recentLogs"
@@ -431,7 +502,7 @@ onBeforeUnmount(() => {
       </section>
     </template>
 
-    <!-- OVERLAY DE REACCIÓN EN PANTALLA (Tipo Terminal de Puerta) -->
+    <!-- OVERLAY DE REACCIÓN EN PANTALLA -->
     <transition name="pop-fade">
       <div
         v-if="feedbackState !== 'idle'"
@@ -440,7 +511,6 @@ onBeforeUnmount(() => {
         @click="dismissFeedback"
       >
         <div class="gate-card" @click.stop>
-          <!-- Estado 1: Validando rápido (Gris/Neutro) -->
           <template v-if="feedbackState === 'scanning'">
             <q-spinner-dots color="grey-8" size="52px" />
             <h2 class="gate-title">{{ feedbackData.title }}</h2>
@@ -448,7 +518,6 @@ onBeforeUnmount(() => {
             <div class="gate-code">{{ feedbackData.code }}</div>
           </template>
 
-          <!-- Estado 2: Aprobado (Verde Esmeralda) -->
           <template v-else-if="feedbackState === 'approved'">
             <div class="gate-icon-circle approved-circle">
               <q-icon name="check" size="48px" color="white" />
@@ -459,7 +528,6 @@ onBeforeUnmount(() => {
             <p class="gate-sub">{{ date(feedbackData.time) }}</p>
           </template>
 
-          <!-- Estado 3: Rechazado (Rojo Intenso) -->
           <template v-else-if="feedbackState === 'rejected'">
             <div class="gate-icon-circle rejected-circle">
               <q-icon name="close" size="48px" color="white" />
@@ -532,7 +600,6 @@ onBeforeUnmount(() => {
   border: 1px solid #fecaca;
 }
 
-/* Overlay tipo terminal de acceso en puerta */
 .gate-overlay {
   position: fixed;
   inset: 0;

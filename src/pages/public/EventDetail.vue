@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import EventCard from '@/components/events/EventCard.vue'
 import { eventService } from '@/services/eventService'
@@ -13,9 +13,13 @@ const router = useRouter()
 const event = ref(null)
 const backdropReady = ref(false)
 
-watch(() => event.value?.imageUrl, () => {
-  backdropReady.value = false
-})
+watch(
+  () => event.value?.imageUrl,
+  () => {
+    backdropReady.value = false
+  }
+)
+
 const summary = ref(null)
 const relatedEvents = ref([])
 const busy = ref(true)
@@ -138,6 +142,10 @@ async function load() {
     error.value = e.message
   } finally {
     busy.value = false
+    if (route.hash === '#resenas' || route.query.review === '1') {
+      await nextTick()
+      scrollToReviewForm()
+    }
   }
 }
 
@@ -283,6 +291,7 @@ onBeforeUnmount(() => {
             <!-- SECCIÓN DE RESEÑAS INTEGRADA EN LA COLUMNA PRINCIPAL (HU-13) -->
             <section
               v-if="showReviewsSection"
+              id="resenas"
               ref="reviewSectionRef"
               class="surface reviews-section"
             >
@@ -320,6 +329,7 @@ onBeforeUnmount(() => {
                   v-for="item in summary.reviews"
                   :key="item.reviewId"
                   class="review-card"
+                  :class="{ 'review-card--own': Number(item.userId) === currentUserId }"
                 >
                   <div class="review-card__top">
                     <div class="review-author">
@@ -440,7 +450,7 @@ onBeforeUnmount(() => {
 
           <!-- COLUMNA DERECHA (ASIDE INTELIGENTE SEGÚN ESTADO DEL EVENTO) -->
           <aside class="surface booking booking-sticky">
-            <!-- CASO A: Evento Finalizado o Cancelado -> Tarjeta de resumen histórico (sin precio ni compra) -->
+            <!-- CASO A: Evento Finalizado o Cancelado -->
             <template v-if="isClosedForSale">
               <div class="archive-badge" :class="isCancelled ? 'archive-cancelled' : 'archive-finished'">
                 <q-icon :name="isCancelled ? 'event_busy' : 'event_available'" size="20px" />
@@ -623,6 +633,7 @@ onBeforeUnmount(() => {
     );
   }
 }
+
 .detail-grid {
   align-items: start;
 }
@@ -664,7 +675,6 @@ onBeforeUnmount(() => {
   font-weight: 700;
 }
 
-/* Tarjeta de archivo cuando el evento ya finalizó o fue cancelado */
 .archive-badge {
   display: inline-flex;
   align-items: center;
@@ -697,7 +707,6 @@ onBeforeUnmount(() => {
   margin-bottom: 6px;
 }
 
-/* Estilos modernos para reseñas */
 .reviews-header {
   display: flex;
   justify-content: space-between;
@@ -753,6 +762,11 @@ onBeforeUnmount(() => {
   border: 1px solid #e2e8f0;
   border-radius: 14px;
   padding: 16px;
+}
+
+.review-card--own {
+  background: #f0fdf4;
+  border-color: #86efac;
 }
 
 .review-card__top {

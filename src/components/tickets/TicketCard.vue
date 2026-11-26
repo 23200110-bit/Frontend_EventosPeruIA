@@ -11,6 +11,11 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  // [AGREGADO] Indica si el usuario ya publicó una reseña activa en este evento
+  alreadyReviewed: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -20,8 +25,37 @@ const statusMeta = computed(() => getTicketStatusMeta(props.ticket.estado))
 const isCanceled = computed(
   () => props.ticket.pendienteReembolso || statusMeta.value.key === 'anulada'
 )
-// [AGREGADO HU-13] Detecta si la entrada ya fue utilizada para habilitar la reseña
+// [AGREGADO HU-13] Detecta si la entrada ya fue utilizada
 const isUsed = computed(() => statusMeta.value.key === 'utilizada')
+
+// [AGREGADO] Solo habilita reseñas cuando la fecha del evento ya culminó
+const isEventFinished = computed(() => {
+  const rawEnd = props.ticket.fechaFin || props.ticket.fechaEvento
+  if (!rawEnd) return false
+  return new Date(rawEnd) < new Date()
+})
+
+// [AGREGADO] Solo permite abrir/usar el QR a partir del día programado del evento
+const canUseTicketToday = computed(() => {
+  const rawStart = props.ticket.fechaEvento
+  if (!rawStart) return true
+  const eventDate = new Date(rawStart)
+  const now = new Date()
+  const startOfEventDay = new Date(
+    eventDate.getFullYear(),
+    eventDate.getMonth(),
+    eventDate.getDate()
+  )
+  return now >= startOfEventDay
+})
+
+// [AGREGADO] Estados excluyentes para reseñar o ver la reseña ya publicada
+const canWriteReview = computed(
+  () => isUsed.value && isEventFinished.value && !props.alreadyReviewed
+)
+const showAlreadyReviewed = computed(
+  () => isUsed.value && isEventFinished.value && props.alreadyReviewed
+)
 </script>
 
 <template>
@@ -78,9 +112,9 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
         <div class="ticket-card__actions">
           <router-link :to="'/evento/' + ticket.eventoId">Ver evento</router-link>
 
-          <!-- [AGREGADO HU-13] Botón directo para reseñar cuando la entrada está Utilizada -->
+          <!-- [AGREGADO HU-13] Solo si el evento culminó, la entrada fue utilizada y aún no reseñó -->
           <q-btn
-            v-if="isUsed"
+            v-if="canWriteReview"
             unelevated
             no-caps
             icon="star_rate"
@@ -92,15 +126,36 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
             }"
           />
 
+          <!-- [AGREGADO HU-13] Si ya reseñó el evento, muestra confirmación y permite ver su reseña -->
           <q-btn
+            v-else-if="showAlreadyReviewed"
             unelevated
             no-caps
-            icon="qr_code_2"
-            label="Ver entrada"
-            class="ticket-card__btn"
-            :loading="loading"
-            @click="emit('select', ticket)"
+            icon="check_circle"
+            label="Ya reseñaste · Ver reseña"
+            class="ticket-card__reviewed-btn"
+            :to="{
+              path: '/evento/' + ticket.eventoId,
+              hash: '#resenas'
+            }"
           />
+
+          <!-- [MODIFICADO] Solo permite abrir/usar el QR en la fecha del evento -->
+          <span style="display: inline-block;">
+            <q-btn
+              unelevated
+              no-caps
+              icon="qr_code_2"
+              :label="canUseTicketToday ? 'Ver entrada' : 'Disponible el día del evento'"
+              class="ticket-card__btn"
+              :loading="loading"
+              :disable="!canUseTicketToday || isCanceled"
+              @click="emit('select', ticket)"
+            />
+            <q-tooltip v-if="!canUseTicketToday && !isCanceled">
+              Podrás abrir y usar tu entrada QR a partir del {{ date(ticket.fechaEvento) }}.
+            </q-tooltip>
+          </span>
         </div>
       </div>
     </div>
@@ -268,6 +323,15 @@ const isUsed = computed(() => statusMeta.value.key === 'utilizada')
 .ticket-card__review-btn {
   background: #fff4d6;
   color: #8a5a00;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-weight: 700;
+}
+
+/* [AGREGADO HU-13] Estilo de insignia/botón cuando ya reseñaste */
+.ticket-card__reviewed-btn {
+  background: #e1f7ea;
+  color: #157a44;
   border-radius: 999px;
   padding: 6px 16px;
   font-weight: 700;

@@ -119,16 +119,27 @@ onMounted(loadMyEvents)
         <p class="muted" style="margin: 0;">Gestiona todos tus eventos en un solo lugar</p>
       </div>
 
-      <q-btn
-        unelevated
-        rounded
-        no-caps
-        color="primary"
-        icon="add"
-        label="Crear evento"
-        style="padding: 10px 22px; font-weight: 600;"
-        @click="router.push('/organizador/crear-evento')"
-      />
+      <div class="row items-center q-gutter-sm">
+        <q-btn
+          outline
+          rounded
+          no-caps
+          color="primary"
+          icon="bar_chart"
+          label="Reportes de ventas"
+          :to="{ name: 'organizer-reports' }"
+        />
+        <q-btn
+          unelevated
+          rounded
+          no-caps
+          color="primary"
+          icon="add"
+          label="Crear evento"
+          style="padding: 10px 22px; font-weight: 600;"
+          @click="router.push('/organizador/crear-evento')"
+        />
+      </div>
     </div>
 
     <!-- 4 Tarjetas KPI -->

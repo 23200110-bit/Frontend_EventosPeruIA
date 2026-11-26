@@ -1,8 +1,9 @@
-import { computed, reactive } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { ticketService } from '@/services/ticketService'
+import { session } from '@/stores/authStore'
 import { normalizeTicketStatus } from '@/utils/ticketHelpers'
 
-const state = reactive({
+const createInitialState = () => ({
   items: [],
   busy: false,
   error: '',
@@ -10,6 +11,20 @@ const state = reactive({
   selectedVoucher: null,
   loadingVoucherId: ''
 })
+
+const state = reactive(createInitialState())
+let activeTicketsRequest = null
+let activeVoucherRequest = null
+
+watch(
+  () => session.token,
+  () => {
+    activeTicketsRequest = null
+    activeVoucherRequest = null
+    Object.assign(state, createInitialState())
+  },
+  { flush: 'sync' }
+)
 
 const counts = computed(() => {
   const todas = state.items.length
@@ -31,23 +46,39 @@ const filteredItems = computed(() => {
 })
 
 async function fetchMyTickets() {
+  if (!session.token) return
+
+  const request = Symbol()
+  activeTicketsRequest = request
   state.busy = true
   state.error = ''
+
   try {
-    state.items = await ticketService.getMyTickets()
+    const items = await ticketService.getMyTickets()
+    if (activeTicketsRequest !== request) return
+    state.items = items
   } catch (e) {
+    if (activeTicketsRequest !== request) return
     state.error = e.message || 'No se pudieron cargar tus entradas.'
   } finally {
-    state.busy = false
+    if (activeTicketsRequest === request) state.busy = false
   }
 }
 
 async function openVoucher(ticket) {
+  if (!session.token) return
+
+  const request = Symbol()
+  activeVoucherRequest = request
   state.error = ''
   state.loadingVoucherId = ticket.entradaId
+
   try {
-    state.selectedVoucher = await ticketService.getVoucher(ticket.entradaId)
+    const voucher = await ticketService.getVoucher(ticket.entradaId)
+    if (activeVoucherRequest !== request) return
+    state.selectedVoucher = voucher
   } catch (e) {
+    if (activeVoucherRequest !== request) return
     if (e?.status === 403 || e?.status === 404) {
       state.error = e.message || 'No tienes permisos para consultar este voucher.'
       state.selectedVoucher = null
@@ -55,7 +86,7 @@ async function openVoucher(ticket) {
       state.selectedVoucher = ticket
     }
   } finally {
-    state.loadingVoucherId = ''
+    if (activeVoucherRequest === request) state.loadingVoucherId = ''
   }
 }
 

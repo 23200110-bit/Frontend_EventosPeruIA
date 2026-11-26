@@ -74,7 +74,7 @@ const canCancel = computed(() => {
         />
         <div
           v-else
-          style="width: 96px; height: 72px; border-radius: 12px; background: #eef2ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+          class="event-card-fallback"
         >
           <q-icon name="event" size="32px" />
         </div>
@@ -177,3 +177,17 @@ const canCancel = computed(() => {
     </div>
   </article>
 </template>
+
+<style scoped>
+.event-card-fallback {
+  width: 96px;
+  height: 72px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand) 15%, transparent);
+  color: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+</style>

@@ -2,24 +2,16 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import EventCard from '@/components/events/EventCard.vue'
+import LoadError from '@/components/common/LoadError.vue'
 import { eventService } from '@/services/eventService'
 import { ticketService } from '@/services/ticketService'
 import { session } from '@/stores/authStore'
-import { date, money } from '@/utils/formatters'
+import { date, money, shortDate } from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
 
 const event = ref(null)
-const backdropReady = ref(false)
-
-watch(
-  () => event.value?.imageUrl,
-  () => {
-    backdropReady.value = false
-  }
-)
-
 const summary = ref(null)
 const relatedEvents = ref([])
 const busy = ref(true)
@@ -195,442 +187,562 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <q-page class="event-detail-page">
-    <div
-      v-if="event?.imageUrl"
-      :key="event.imageUrl"
-      class="event-detail-backdrop"
-      :class="{ 'is-ready': backdropReady }"
-      aria-hidden="true"
-    >
-      <img
-        :src="event.imageUrl"
-        alt=""
-        @load="backdropReady = true"
-        @error="backdropReady = false"
-      />
+  <q-page class="detail-page" :class="{ 'has-buybar': event && !isClosedForSale }">
+    <div v-if="!event" class="container">
+      <router-link to="/explorar" class="back-link">← Volver a explorar</router-link>
+      <LoadError v-if="error && !busy" :message="error" :busy="busy" @retry="load" />
+      <div v-if="busy" class="empty"><q-spinner /> Cargando evento…</div>
     </div>
 
-    <div class="container event-detail-content">
-      <router-link to="/explorar" class="back-link">← Volver a explorar</router-link>
+    <template v-if="event">
+      <!-- CABECERA INMERSIVA: imagen a todo el ancho con degradado para leer el texto -->
+      <header class="detail-hero" :class="{ 'is-closed': isClosedForSale }">
+        <div
+          class="detail-hero__bg"
+          :style="event.imageUrl ? { backgroundImage: 'url(' + JSON.stringify(event.imageUrl) + ')' } : null"
+          aria-hidden="true"
+        ></div>
+        <div class="detail-hero__shade" aria-hidden="true"></div>
+        <div class="detail-hero__content">
+          <router-link to="/explorar" class="detail-back">
+            <q-icon name="arrow_back" size="18px" aria-hidden="true" /> Explorar
+          </router-link>
+          <div class="detail-hero__eyebrow">{{ [event.category, event.city].filter(Boolean).join(' · ') }}</div>
+          <h1 class="detail-hero__title">{{ event.name }}</h1>
+          <p class="detail-hero__meta">
+            <span><q-icon name="event" size="18px" aria-hidden="true" /> {{ shortDate(event.startDate) }}</span>
+            <span v-if="event.venue || event.address">
+              <q-icon name="place" size="18px" aria-hidden="true" /> {{ event.venue || event.address }}
+            </span>
+          </p>
 
-      <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
-      <div v-if="busy" class="empty"><q-spinner /> Cargando evento…</div>
-
-      <template v-if="event">
-        <div class="detail-top detail-grid">
-          <!-- COLUMNA PRINCIPAL IZQUIERDA -->
-          <div class="detail-main">
-            <div class="eyebrow">{{ event.category }} · {{ event.city }}</div>
-            <h1 class="page-heading">{{ event.name }}</h1>
-
-            <!-- Badges de estado y valoración -->
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
-              <q-badge
-                :color="isCancelled ? 'negative' : isFinished ? 'grey-8' : 'primary'"
-                style="padding: 5px 10px; font-weight: 700;"
-              >
-                {{ isCancelled ? 'Cancelado' : isFinished ? 'Finalizado' : event.status }}
-              </q-badge>
-              <q-badge
-                v-if="isSoldOut && !isClosedForSale"
-                color="grey-8"
-                style="padding: 5px 10px; font-weight: 700;"
-              >
-                Agotado
-              </q-badge>
-              <q-badge
-                v-if="summary?.totalReviews"
-                color="amber-8"
-                text-color="black"
-                style="padding: 5px 10px; font-weight: 700;"
-              >
-                ★ {{ Number(summary.averageRating).toFixed(1) }} ({{ summary.totalReviews }})
-              </q-badge>
-            </div>
-
-            <p class="detail-description">{{ event.description }}</p>
-
-            <!-- Ficha técnica del evento -->
-            <div class="surface info-card">
-              <h2 class="section-card-title">Detalle sobre este evento</h2>
-              <div class="info-list">
-                <div class="info-row">
-                  <q-icon name="event" size="20px" color="primary" />
-                  <div>
-                    <small class="muted">Fecha y hora</small>
-                    <div><strong>{{ date(event.startDate) }}</strong></div>
-                  </div>
-                </div>
-                <div class="info-row">
-                  <q-icon name="place" size="20px" color="primary" />
-                  <div>
-                    <small class="muted">Ubicación</small>
-                    <div>
-                      <strong>{{ event.venue }}</strong> · {{ event.address }}, {{ event.city }}
-                    </div>
-                  </div>
-                </div>
-                <div class="info-row">
-                  <q-icon name="person_pin" size="20px" color="primary" />
-                  <div>
-                    <small class="muted">Organizador</small>
-                    <div><strong>{{ event.organizer }}</strong></div>
-                  </div>
-                </div>
-                <div class="info-row">
-                  <q-icon name="groups" size="20px" color="primary" />
-                  <div>
-                    <small class="muted">Aforo del recinto</small>
-                    <div><strong>{{ event.capacity }} personas</strong></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SECCIÓN DE RESEÑAS INTEGRADA EN LA COLUMNA PRINCIPAL (HU-13) -->
-            <section
-              v-if="showReviewsSection"
-              id="resenas"
-              ref="reviewSectionRef"
-              class="surface reviews-section"
+          <!-- Badges de estado y valoración -->
+          <div class="detail-badges">
+            <q-badge
+              :color="isCancelled ? 'negative' : isFinished ? 'grey-8' : 'primary'"
+              style="padding: 5px 10px; font-weight: 700;"
             >
-              <div class="reviews-header">
-                <div>
-                  <div class="eyebrow">OPINIONES VERIFICADAS</div>
-                  <h2 class="section-card-title" style="margin-bottom: 4px;">
-                    Lo que cuenta la comunidad
-                  </h2>
-                </div>
+              {{ isCancelled ? 'Cancelado' : isFinished ? 'Finalizado' : event.status }}
+            </q-badge>
+            <q-badge
+              v-if="isSoldOut && !isClosedForSale"
+              color="grey-8"
+              style="padding: 5px 10px; font-weight: 700;"
+            >
+              Agotado
+            </q-badge>
+            <q-badge
+              v-if="summary?.totalReviews"
+              color="amber-8"
+              text-color="black"
+              style="padding: 5px 10px; font-weight: 700;"
+            >
+              ★ {{ Number(summary.averageRating).toFixed(1) }} ({{ summary.totalReviews }})
+            </q-badge>
+          </div>
+        </div>
+      </header>
 
-                <div v-if="summary?.totalReviews" class="rating-summary-pill">
-                  <span class="rating-big">{{ Number(summary.averageRating).toFixed(1) }}</span>
+      <div class="container detail-body">
+      <q-banner v-if="error" class="error" role="alert">{{ error }}</q-banner>
+      <div class="detail-top detail-grid">
+        <!-- COLUMNA PRINCIPAL IZQUIERDA -->
+        <div class="detail-main">
+          <p class="detail-description">{{ event.description }}</p>
+
+          <!-- Ficha técnica del evento -->
+          <div class="surface info-card">
+            <h2 class="section-card-title">Detalle sobre este evento</h2>
+            <div class="info-list">
+              <div class="info-row">
+                <q-icon name="event" size="20px" color="primary" />
+                <div>
+                  <small class="muted">Fecha y hora</small>
+                  <div><strong>{{ date(event.startDate) }}</strong></div>
+                </div>
+              </div>
+              <div class="info-row">
+                <q-icon name="place" size="20px" color="primary" />
+                <div>
+                  <small class="muted">Ubicación</small>
                   <div>
-                    <div class="stars-row" aria-label="Calificación promedio">
-                      <span
-                        v-for="n in 5"
-                        :key="n"
-                        :class="n <= Math.round(summary.averageRating) ? 'star-on' : 'star-off'"
-                      >
-                        ★
-                      </span>
-                    </div>
-                    <small class="muted">
-                      {{ summary.totalReviews }}
-                      {{ summary.totalReviews === 1 ? 'reseña' : 'reseñas' }}
-                    </small>
+                    <strong>{{ event.venue }}</strong> · {{ event.address }}, {{ event.city }}
                   </div>
                 </div>
               </div>
-
-              <!-- Lista de reseñas -->
-              <div v-if="summary?.reviews?.length" class="reviews-list">
-                <article
-                  v-for="item in summary.reviews"
-                  :key="item.reviewId"
-                  class="review-card"
-                  :class="{ 'review-card--own': Number(item.userId) === currentUserId }"
-                >
-                  <div class="review-card__top">
-                    <div class="review-author">
-                      <div class="review-avatar">
-                        <q-icon name="person" size="18px" />
-                      </div>
-                      <div>
-                        <div class="review-author__name">
-                          {{
-                            Number(item.userId) === currentUserId
-                              ? 'Tu reseña verificada'
-                              : 'Asistente verificado'
-                          }}
-                        </div>
-                        <small class="muted">{{ date(item.createdAt) }}</small>
-                      </div>
-                    </div>
-
-                    <div class="review-stars">
-                      <span
-                        v-for="n in 5"
-                        :key="n"
-                        :class="n <= item.rating ? 'star-on' : 'star-off'"
-                      >
-                        ★
-                      </span>
-                    </div>
-                  </div>
-
-                  <p class="review-card__body">
-                    {{ item.comment || 'Calificación sin comentario adicional.' }}
-                  </p>
-                </article>
-              </div>
-
-              <p v-else class="muted" style="margin: 14px 0 4px;">
-                Aún no hay reseñas publicadas para este evento.
-              </p>
-
-              <!-- Ya reseñó: oculta el formulario y confirma -->
-              <div v-if="session.user && isFinished && userAlreadyReviewed" class="reviewed-banner">
-                <q-icon name="check_circle" color="positive" size="24px" />
+              <div class="info-row">
+                <q-icon name="person_pin" size="20px" color="primary" />
                 <div>
-                  <strong>Ya compartiste tu experiencia sobre este evento</strong>
-                  <p class="muted" style="margin: 2px 0 0; font-size: 13.5px;">
-                    Solo se permite una reseña activa por asistente. ¡Gracias por aportar a la comunidad!
-                  </p>
+                  <small class="muted">Organizador</small>
+                  <div><strong>{{ event.organizer }}</strong></div>
                 </div>
               </div>
-
-              <!-- Puede reseñar: formulario limpio sin campo UUID -->
-              <q-form
-                v-else-if="canWriteReview"
-                class="review-composer"
-                @submit.prevent="sendReview"
-              >
-                <div class="review-composer__head">
-                  <h3 style="font-size: 17px; font-weight: 700; margin: 0;">Comparte tu experiencia</h3>
-                  <q-badge color="positive" outline label="Asistencia verificada" />
+              <div class="info-row">
+                <q-icon name="groups" size="20px" color="primary" />
+                <div>
+                  <small class="muted">Aforo del recinto</small>
+                  <div><strong>{{ event.capacity }} personas</strong></div>
                 </div>
-                <p class="muted" style="margin: 4px 0 12px; font-size: 13.5px;">
-                  Tu opinión ayuda a otros usuarios a decidir a qué eventos asistir.
-                </p>
-
-                <div style="margin-bottom: 12px;">
-                  <small class="muted" style="display: block; margin-bottom: 4px;">
-                    ¿Qué te pareció el evento?
-                  </small>
-                  <q-rating
-                    v-model="review.rating"
-                    :max="5"
-                    size="32px"
-                    color="amber-7"
-                    icon="star_border"
-                    icon-selected="star"
-                  />
-                </div>
-
-                <q-input
-                  v-model="review.comment"
-                  outlined
-                  type="textarea"
-                  rows="3"
-                  bg-color="white"
-                  label="Cuéntanos qué fue lo que más te gustó (opcional)"
-                  maxlength="1000"
-                  counter
-                />
-
-                <q-banner v-if="reviewError" class="error" role="alert" style="margin-top: 10px;">
-                  {{ reviewError }}
-                </q-banner>
-
-                <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
-                  <q-btn
-                    type="submit"
-                    unelevated
-                    no-caps
-                    color="primary"
-                    icon="send"
-                    label="Publicar reseña"
-                    :loading="submittingReview"
-                    style="border-radius: 999px; padding: 8px 22px; font-weight: 700;"
-                  />
-                </div>
-              </q-form>
-
-              <!-- Logueado pero sin entrada utilizada -->
-              <div
-                v-else-if="session.user && isFinished && !review.ticketId"
-                class="muted"
-                style="margin-top: 16px; font-size: 13.5px;"
-              >
-                Solo los asistentes que validaron su entrada en puerta pueden dejar una reseña.
               </div>
-            </section>
+            </div>
           </div>
 
-          <!-- COLUMNA DERECHA (ASIDE INTELIGENTE SEGÚN ESTADO DEL EVENTO) -->
-          <aside class="surface booking booking-sticky">
-            <!-- CASO A: Evento Finalizado o Cancelado -->
-            <template v-if="isClosedForSale">
-              <div class="archive-badge" :class="isCancelled ? 'archive-cancelled' : 'archive-finished'">
-                <q-icon :name="isCancelled ? 'event_busy' : 'event_available'" size="20px" />
-                <span>{{ isCancelled ? 'EVENTO CANCELADO' : 'EDICIÓN FINALIZADA' }}</span>
+          <!-- SECCIÓN DE RESEÑAS INTEGRADA EN LA COLUMNA PRINCIPAL (HU-13) -->
+          <section
+            v-if="showReviewsSection"
+            id="resenas"
+            ref="reviewSectionRef"
+            class="surface reviews-section"
+          >
+            <div class="reviews-header">
+              <div>
+                <div class="eyebrow">OPINIONES VERIFICADAS</div>
+                <h2 class="section-card-title" style="margin-bottom: 4px;">
+                  Lo que cuenta la comunidad
+                </h2>
               </div>
 
-              <h3 style="font-size: 20px; font-weight: 800; margin: 14px 0 6px; line-height: 1.25;">
-                {{
-                  isCancelled
-                    ? 'Este evento fue cancelado por el organizador'
-                    : 'Este evento ya concluyó'
-                }}
-              </h3>
-
-              <p class="muted" style="font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
-                {{
-                  isCancelled
-                    ? 'La venta de entradas se encuentra cerrada. Revisa tus entradas si adquiriste un ticket para este evento.'
-                    : 'La venta de entradas está cerrada. Revisa las experiencias de los asistentes o descubre próximas fechas.'
-                }}
-              </p>
-
-              <div v-if="isFinished && summary?.totalReviews" class="archive-stat-box">
+              <div v-if="summary?.totalReviews" class="rating-summary-pill">
+                <span class="rating-big">{{ Number(summary.averageRating).toFixed(1) }}</span>
                 <div>
-                  <small class="muted">Valoración del público</small>
-                  <div style="font-size: 18px; font-weight: 800;">
-                    ★ {{ Number(summary.averageRating).toFixed(1) }} / 5.0
+                  <div class="stars-row" aria-label="Calificación promedio">
+                    <span
+                      v-for="n in 5"
+                      :key="n"
+                      :class="n <= Math.round(summary.averageRating) ? 'star-on' : 'star-off'"
+                    >
+                      ★
+                    </span>
+                  </div>
+                  <small class="muted">
+                    {{ summary.totalReviews }}
+                    {{ summary.totalReviews === 1 ? 'reseña' : 'reseñas' }}
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lista de reseñas -->
+            <div v-if="summary?.reviews?.length" class="reviews-list">
+              <article
+                v-for="item in summary.reviews"
+                :key="item.reviewId"
+                class="review-card"
+                :class="{ 'review-card--own': Number(item.userId) === currentUserId }"
+              >
+                <div class="review-card__top">
+                  <div class="review-author">
+                    <div class="review-avatar">
+                      <q-icon name="person" size="18px" />
+                    </div>
+                    <div>
+                      <div class="review-author__name">
+                        {{
+                          Number(item.userId) === currentUserId
+                            ? 'Tu reseña verificada'
+                            : 'Asistente verificado'
+                        }}
+                      </div>
+                      <small class="muted">{{ date(item.createdAt) }}</small>
+                    </div>
+                  </div>
+
+                  <div class="review-stars">
+                    <span
+                      v-for="n in 5"
+                      :key="n"
+                      :class="n <= item.rating ? 'star-on' : 'star-off'"
+                    >
+                      ★
+                    </span>
                   </div>
                 </div>
-                <q-badge color="amber-8" text-color="black">
-                  {{ summary.totalReviews }} {{ summary.totalReviews === 1 ? 'opinión' : 'opiniones' }}
-                </q-badge>
+
+                <p class="review-card__body">
+                  {{ item.comment || 'Calificación sin comentario adicional.' }}
+                </p>
+              </article>
+            </div>
+
+            <p v-else class="muted" style="margin: 14px 0 4px;">
+              Aún no hay reseñas publicadas para este evento.
+            </p>
+
+            <!-- Ya reseñó: oculta el formulario y confirma -->
+            <div v-if="session.user && isFinished && userAlreadyReviewed" class="reviewed-banner">
+              <q-icon name="check_circle" color="positive" size="24px" />
+              <div>
+                <strong>Ya compartiste tu experiencia sobre este evento</strong>
+                <p class="muted" style="margin: 2px 0 0; font-size: 13.5px;">
+                  Solo se permite una reseña activa por asistente. ¡Gracias por aportar a la comunidad!
+                </p>
+              </div>
+            </div>
+
+            <!-- Puede reseñar: formulario limpio sin campo UUID -->
+            <q-form
+              v-else-if="canWriteReview"
+              class="review-composer"
+              @submit.prevent="sendReview"
+            >
+              <div class="review-composer__head">
+                <h3 style="font-size: 17px; font-weight: 700; margin: 0;">Comparte tu experiencia</h3>
+                <q-badge color="positive" outline label="Asistencia verificada" />
+              </div>
+              <p class="muted" style="margin: 4px 0 12px; font-size: 13.5px;">
+                Tu opinión ayuda a otros usuarios a decidir a qué eventos asistir.
+              </p>
+
+              <div style="margin-bottom: 12px;">
+                <small class="muted" style="display: block; margin-bottom: 4px;">
+                  ¿Qué te pareció el evento?
+                </small>
+                <q-rating
+                  v-model="review.rating"
+                  :max="5"
+                  size="32px"
+                  color="amber-7"
+                  icon="star_border"
+                  icon-selected="star"
+                />
               </div>
 
-              <q-btn
-                v-if="canWriteReview"
-                unelevated
-                no-caps
-                color="primary"
-                icon="rate_review"
-                label="Calificar mi asistencia"
-                class="full-width booking-cta"
-                @click="scrollToReviewForm"
+              <q-input
+                v-model="review.comment"
+                outlined
+                type="textarea"
+                rows="3"
+                label="Cuéntanos qué fue lo que más te gustó (opcional)"
+                maxlength="1000"
+                counter
               />
 
-              <q-btn
-                unelevated
-                no-caps
-                :outline="canWriteReview"
-                color="primary"
-                icon="explore"
-                label="Explorar próximos eventos"
-                class="full-width booking-cta"
-                to="/explorar"
-              />
-            </template>
+              <q-banner v-if="reviewError" class="error" role="alert" style="margin-top: 10px;">
+                {{ reviewError }}
+              </q-banner>
 
-            <!-- CASO B: Evento Activo / Próximo -> Panel de venta de entradas -->
-            <template v-else>
-              <small>ENTRADA</small>
-              <h2>{{ event.price === 0 ? 'Gratis' : money(event.price, event.currency) }}</h2>
-              <p>
-                <strong v-if="isSoldOut" class="text-grey-8">Evento agotado</strong>
-                <span v-else>
-                  <strong>{{ event.availableSpots }}</strong> de {{ event.capacity }} cupos disponibles
-                </span>
-              </p>
-              <q-linear-progress
-                :value="event.capacity > 0 ? Math.max(0, Math.min(1, event.availableSpots / event.capacity)) : 0"
-                :color="isSoldOut ? 'grey' : 'primary'"
-              />
-              <p class="muted" style="margin-top: 8px;">Cupos sujetos a disponibilidad.</p>
+              <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+                <q-btn
+                  type="submit"
+                  unelevated
+                  no-caps
+                  color="primary"
+                  icon="send"
+                  label="Publicar reseña"
+                  :loading="submittingReview"
+                  style="border-radius: 999px; padding: 8px 22px; font-weight: 700;"
+                />
+              </div>
+            </q-form>
 
-              <q-btn
-                unelevated
-                no-caps
-                color="primary"
-                icon="confirmation_number"
-                class="full-width booking-cta"
-                :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
-                :disable="isSoldOut"
-                @click="handleBuyAction"
-              />
-            </template>
-          </aside>
+            <!-- Logueado pero sin entrada utilizada -->
+            <div
+              v-else-if="session.user && isFinished && !review.ticketId"
+              class="muted"
+              style="margin-top: 16px; font-size: 13.5px;"
+            >
+              Solo los asistentes que validaron su entrada en puerta pueden dejar una reseña.
+            </div>
+          </section>
         </div>
 
-        <!-- Próximos eventos que podrían interesarte -->
-        <section v-if="relatedEvents.length" style="margin-top: 40px;">
-          <div class="eyebrow">SIGUE EXPLORANDO</div>
-          <h2 class="section-card-title">Próximos eventos que podrían interesarte</h2>
-          <div class="event-grid">
-            <EventCard
-              v-for="(ev, idx) in relatedEvents"
-              :key="ev.id"
-              :event="ev"
-              :index="idx"
+        <!-- COLUMNA DERECHA (ASIDE INTELIGENTE SEGÚN ESTADO DEL EVENTO) -->
+        <aside class="surface booking booking-sticky">
+          <!-- CASO A: Evento Finalizado o Cancelado -> Tarjeta de resumen histórico (sin precio ni compra) -->
+          <template v-if="isClosedForSale">
+            <div class="archive-badge" :class="isCancelled ? 'archive-cancelled' : 'archive-finished'">
+              <q-icon :name="isCancelled ? 'event_busy' : 'event_available'" size="20px" />
+              <span>{{ isCancelled ? 'EVENTO CANCELADO' : 'EDICIÓN FINALIZADA' }}</span>
+            </div>
+
+            <h3 style="font-size: 20px; font-weight: 800; margin: 14px 0 6px; line-height: 1.25;">
+              {{
+                isCancelled
+                  ? 'Este evento fue cancelado por el organizador'
+                  : 'Este evento ya concluyó'
+              }}
+            </h3>
+
+            <p class="muted" style="font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
+              {{
+                isCancelled
+                  ? 'La venta de entradas se encuentra cerrada. Revisa tus entradas si adquiriste un ticket para este evento.'
+                  : 'La venta de entradas está cerrada. Revisa las experiencias de los asistentes o descubre próximas fechas.'
+              }}
+            </p>
+
+            <div v-if="isFinished && summary?.totalReviews" class="archive-stat-box">
+              <div>
+                <small class="muted">Valoración del público</small>
+                <div style="font-size: 18px; font-weight: 800;">
+                  ★ {{ Number(summary.averageRating).toFixed(1) }} / 5.0
+                </div>
+              </div>
+              <q-badge color="amber-8" text-color="black">
+                {{ summary.totalReviews }} {{ summary.totalReviews === 1 ? 'opinión' : 'opiniones' }}
+              </q-badge>
+            </div>
+
+            <q-btn
+              v-if="canWriteReview"
+              unelevated
+              no-caps
+              color="primary"
+              icon="rate_review"
+              label="Calificar mi asistencia"
+              class="full-width booking-cta"
+              @click="scrollToReviewForm"
             />
-          </div>
-        </section>
-      </template>
-    </div>
+
+            <q-btn
+              unelevated
+              no-caps
+              :outline="canWriteReview"
+              color="primary"
+              icon="explore"
+              label="Explorar próximos eventos"
+              class="full-width booking-cta"
+              to="/explorar"
+            />
+          </template>
+
+          <!-- CASO B: Evento Activo / Próximo -> Panel de venta de entradas -->
+          <template v-else>
+            <small>ENTRADA</small>
+            <h2>{{ event.price === 0 ? 'Gratis' : money(event.price, event.currency) }}</h2>
+            <p>
+              <strong v-if="isSoldOut" class="text-grey-8">Evento agotado</strong>
+              <span v-else>
+                <strong>{{ event.availableSpots }}</strong> de {{ event.capacity }} cupos disponibles
+              </span>
+            </p>
+            <q-linear-progress
+              :value="event.capacity > 0 ? Math.max(0, Math.min(1, event.availableSpots / event.capacity)) : 0"
+              :color="isSoldOut ? 'grey' : 'primary'"
+            />
+            <p class="muted" style="margin-top: 8px;">Cupos sujetos a disponibilidad.</p>
+
+            <q-btn
+              unelevated
+              no-caps
+              color="primary"
+              icon="confirmation_number"
+              class="full-width booking-cta btn-buy"
+              :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
+              :disable="isSoldOut"
+              @click="handleBuyAction"
+            />
+          </template>
+        </aside>
+      </div>
+
+      <!-- Próximos eventos que podrían interesarte -->
+      <section v-if="relatedEvents.length" style="margin-top: 40px;">
+        <div class="eyebrow">SIGUE EXPLORANDO</div>
+        <h2 class="section-card-title">Próximos eventos que podrían interesarte</h2>
+        <div class="event-grid">
+          <EventCard
+            v-for="(ev, idx) in relatedEvents"
+            :key="ev.id"
+            :event="ev"
+            :index="idx"
+          />
+        </div>
+      </section>
+      </div>
+
+      <!-- BARRA DE COMPRA FIJA EN MÓVIL: precio y botón siempre a mano -->
+      <div v-if="!isClosedForSale" class="buybar" role="region" aria-label="Comprar entrada">
+        <div class="buybar__price">
+          <small>Entrada</small>
+          <strong>{{ event.price === 0 ? 'Gratis' : money(event.price, event.currency) }}</strong>
+        </div>
+        <q-btn
+          unelevated
+          rounded
+          no-caps
+          color="primary"
+          icon="confirmation_number"
+          class="buybar__cta btn-buy"
+          :label="isSoldOut ? 'Agotado' : 'Comprar entrada'"
+          :disable="isSoldOut"
+          @click="handleBuyAction"
+        />
+      </div>
+    </template>
   </q-page>
 </template>
 
 <style scoped>
-.event-detail-page {
+/* Cabecera inmersiva */
+.detail-hero {
   position: relative;
-  isolation: isolate;
-}
-
-.event-detail-content > .back-link {
-  color: #cfe0ff;
-}
-
-.event-detail-backdrop {
-  position: absolute;
-  inset: 0 0 auto;
-  z-index: -1;
-  height: clamp(470px, 40vw, 640px);
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
   overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(105deg, #071630 10%, #112752 62%, #182d59);
-  mask-image: linear-gradient(to bottom, #000 64%, transparent 100%);
+  color: #ffffff;
+  background: linear-gradient(135deg, #24156b 0%, #5038b9 55%, #a8327a 100%);
 }
 
-.event-detail-backdrop.is-ready {
-  opacity: 1;
-}
-
-.event-detail-backdrop img {
-  position: absolute;
-  top: 0;
-  right: max(0px, calc((100% - 820px) / 2));
-  display: block;
-  width: auto;
-  max-width: 76%;
-  height: 100%;
-  object-fit: contain;
-  object-position: right top;
-  opacity: 0.72;
-  filter: blur(2px);
-  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-}
-
-.event-detail-backdrop::after {
-  content: '';
+.detail-hero__bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    #071630 4%,
-    rgba(7, 22, 48, 0.95) 30%,
-    rgba(7, 22, 48, 0.78) 48%,
-    rgba(7, 22, 48, 0.24) 73%,
-    rgba(7, 22, 48, 0.12) 100%
-  );
+  background-size: cover;
+  background-position: center;
 }
 
-@media (max-width: 700px) {
-  .event-detail-backdrop {
-    height: 540px;
-  }
+.detail-hero.is-closed .detail-hero__bg {
+  filter: grayscale(0.6);
+}
 
-  .event-detail-backdrop img {
+.detail-hero__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 8, 20, 0.3) 0%, rgba(10, 8, 20, 0.55) 50%, rgba(10, 8, 20, 0.92) 100%);
+}
+
+.detail-hero__content {
+  position: relative;
+  width: 100%;
+  max-width: 1190px;
+  margin: 0 auto;
+  padding: 84px 24px 30px;
+}
+
+.detail-back {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(10, 8, 20, 0.45);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.detail-back:hover,
+.detail-back:focus-visible {
+  background: rgba(10, 8, 20, 0.7);
+}
+
+.detail-hero__eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.detail-hero__title {
+  margin: 8px 0 12px;
+  max-width: 900px;
+  font-size: clamp(32px, 5.2vw, 56px);
+  line-height: 1.05;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.detail-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.detail-hero__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail-body {
+  padding-top: 8px;
+}
+
+.detail-body .detail-top {
+  margin-top: 20px;
+}
+
+.detail-description {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Barra de compra fija sólo en móvil */
+.buybar {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .detail-hero {
+    min-height: 320px;
+  }
+  .detail-hero__content {
+    padding: 76px 16px 22px;
+  }
+  .detail-back {
+    left: 16px;
+    top: 16px;
+  }
+  .detail-page.has-buybar {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  }
+  .buybar {
+    display: flex;
+    position: fixed;
+    left: 0;
     right: 0;
-    width: 100%;
-    max-width: 100%;
-    object-position: center top;
-    opacity: 0.45;
+    bottom: 0;
+    z-index: 60;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -10px 24px -14px rgba(0, 0, 0, 0.4);
   }
-
-  .event-detail-backdrop::after {
-    background: linear-gradient(
-      180deg,
-      rgba(7, 22, 48, 0.55),
-      rgba(7, 22, 48, 0.85) 72%,
-      #071630
-    );
+  .buybar__price {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .buybar__price small {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .buybar__price strong {
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-primary);
+  }
+  .buybar__cta {
+    min-height: 48px;
+    padding: 0 22px;
+    font-weight: 800;
   }
 }
 
@@ -652,7 +764,7 @@ onBeforeUnmount(() => {
 .section-card-title {
   font-size: 19px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--text-primary);
   margin: 0 0 14px;
 }
 
@@ -675,6 +787,7 @@ onBeforeUnmount(() => {
   font-weight: 700;
 }
 
+/* Tarjeta de archivo cuando el evento ya finalizó o fue cancelado */
 .archive-badge {
   display: inline-flex;
   align-items: center;
@@ -687,26 +800,29 @@ onBeforeUnmount(() => {
 }
 
 .archive-finished {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .archive-cancelled {
-  background: #fef2f2;
-  color: #b91c1c;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #dc2626;
 }
 
 .archive-stat-box {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 12px 14px;
   margin-bottom: 6px;
 }
 
+/* Estilos modernos para reseñas */
 .reviews-header {
   display: flex;
   justify-content: space-between;
@@ -714,15 +830,15 @@ onBeforeUnmount(() => {
   gap: 16px;
   flex-wrap: wrap;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--line, #e5e7eb);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .rating-summary-pill {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   padding: 10px 16px;
   border-radius: 14px;
 }
@@ -730,7 +846,7 @@ onBeforeUnmount(() => {
 .rating-big {
   font-size: 28px;
   font-weight: 800;
-  color: var(--ink, #111827);
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -747,7 +863,7 @@ onBeforeUnmount(() => {
 }
 
 .star-off {
-  color: #cbd5e1;
+  color: var(--border-color);
 }
 
 .reviews-list {
@@ -758,15 +874,10 @@ onBeforeUnmount(() => {
 }
 
 .review-card {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 16px;
-}
-
-.review-card--own {
-  background: #f0fdf4;
-  border-color: #86efac;
 }
 
 .review-card__top {
@@ -787,8 +898,8 @@ onBeforeUnmount(() => {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #ede9fe;
-  color: #5b21b6;
+  background: rgba(124, 92, 245, 0.16);
+  color: var(--brand);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -797,23 +908,23 @@ onBeforeUnmount(() => {
 .review-author__name {
   font-weight: 700;
   font-size: 14px;
-  color: var(--ink, #111827);
+  color: var(--text-primary);
 }
 
 .review-card__body {
   margin: 0;
   font-size: 14.5px;
   line-height: 1.5;
-  color: #334155;
+  color: var(--text-primary);
 }
 
 .reviewed-banner {
   margin-top: 20px;
   padding: 14px 18px;
   border-radius: 14px;
-  background: #ecfdf5;
-  border: 1px solid #bbf7d0;
-  color: #14532d;
+  background: rgba(18, 163, 114, 0.12);
+  border: 1px solid rgba(18, 163, 114, 0.35);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -823,8 +934,8 @@ onBeforeUnmount(() => {
   margin-top: 20px;
   padding: 20px;
   border-radius: 16px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
 }
 
 .review-composer__head {
@@ -833,5 +944,10 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.review-card--own {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: #86efac;
 }
 </style>

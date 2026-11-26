@@ -162,7 +162,7 @@ onMounted(loadMyEvents)
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
       <div class="surface" style="border-radius: 16px; padding: 18px;">
         <q-icon name="festival" color="primary" size="26px" />
-        <div style="font-size: 1.7rem; font-weight: 700; color: #4f46e5; margin-top: 8px;">
+        <div class="kpi-value kpi-value--brand">
           {{ kpis.total }}
         </div>
         <div class="muted">Eventos totales</div>
@@ -170,7 +170,7 @@ onMounted(loadMyEvents)
 
       <div class="surface" style="border-radius: 16px; padding: 18px;">
         <q-icon name="check_circle" color="positive" size="26px" />
-        <div style="font-size: 1.7rem; font-weight: 700; color: #16a34a; margin-top: 8px;">
+        <div class="kpi-value kpi-value--success">
           {{ kpis.published }}
         </div>
         <div class="muted">Publicados activos</div>
@@ -178,7 +178,7 @@ onMounted(loadMyEvents)
 
       <div class="surface" style="border-radius: 16px; padding: 18px;">
         <q-icon name="confirmation_number" color="amber-8" size="26px" />
-        <div style="font-size: 1.7rem; font-weight: 700; color: #4f46e5; margin-top: 8px;">
+        <div class="kpi-value kpi-value--warning">
           {{ kpis.ticketsSold }}
         </div>
         <div class="muted">Entradas vendidas</div>
@@ -186,7 +186,7 @@ onMounted(loadMyEvents)
 
       <div class="surface" style="border-radius: 16px; padding: 18px;">
         <q-icon name="payments" color="orange-8" size="26px" />
-        <div style="font-size: 1.7rem; font-weight: 700; color: #ea580c; margin-top: 8px;">
+        <div class="kpi-value kpi-value--warning">
           {{ money(kpis.revenue) }}
         </div>
         <div class="muted">Ingresos totales</div>
@@ -262,3 +262,23 @@ onMounted(loadMyEvents)
     />
   </q-page>
 </template>
+
+<style scoped>
+.kpi-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.kpi-value--brand {
+  color: var(--brand);
+}
+
+.kpi-value--success {
+  color: color-mix(in srgb, var(--success) 60%, var(--text-primary));
+}
+
+.kpi-value--warning {
+  color: color-mix(in srgb, var(--warning) 60%, var(--text-primary));
+}
+</style>

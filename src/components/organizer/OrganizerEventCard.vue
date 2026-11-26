@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { date, money } from '@/utils/formatters'
+import { date } from '@/utils/formatters'
 
 const props = defineProps({
   event: { type: Object, required: true }
@@ -14,7 +14,6 @@ const totalCapacity = computed(() => Number(props.event.aforo ?? 0))
 const progressRatio = computed(() =>
   totalCapacity.value > 0 ? Math.min(soldCount.value / totalCapacity.value, 1) : 0
 )
-const estimatedRevenue = computed(() => soldCount.value * Number(props.event.precio ?? 0))
 
 const isPendingReview = computed(() => {
   const st = (props.event.estado || '').toLowerCase()
@@ -85,12 +84,8 @@ const canCancel = computed(() => {
         </div>
       </div>
 
-      <!-- Ingresos y botones de acción -->
+      <!-- Botones de acción -->
       <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-        <div style="text-align: right;">
-          <div class="muted" style="font-size: 0.78rem;">Ingresos</div>
-          <strong style="font-size: 1.05rem;">{{ money(estimatedRevenue) }}</strong>
-        </div>
 
         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <q-btn

@@ -23,6 +23,17 @@ const isValid = computed(() => statusMeta.value.key === 'valida')
 const isUsed = computed(() => statusMeta.value.key === 'utilizada')
 const isCanceled = computed(() => statusMeta.value.key === 'anulada')
 
+const qrPayload = computed(() => {
+  const payload = props.ticket?.qrPayload
+
+  if (props.ticket?.estaActiva !== true || !isValid.value) return ''
+  if (typeof payload !== 'string' || !isValidUuid(payload.trim())) return ''
+
+  return payload.trim()
+})
+
+const showQr = computed(() => Boolean(qrPayload.value && qrDataUrl.value))
+
 const formattedDate = computed(() =>
   date(props.ticket?.fechaYHora || props.ticket?.fechaEvento)
 )
@@ -39,29 +50,33 @@ const formattedPrice = computed(() =>
 )
 
 watch(
-  () => props.ticket,
-  async (val) => {
+  [() => props.ticket, qrPayload],
+  async ([, payload], _, onCleanup) => {
     qrDataUrl.value = ''
-    if (!val || !isValid.value) return
+    if (!payload) return
 
-    const candidate = val.qrPayload || val.codigoQrData || val.entradaId
-    if (!isValidUuid(candidate)) return
+    let vigente = true
+    onCleanup(() => {
+      vigente = false
+    })
 
     try {
-      qrDataUrl.value = await QRCode.toDataURL(candidate.trim(), {
+      const dataUrl = await QRCode.toDataURL(payload, {
         width: 220,
         margin: 1,
         color: { dark: '#181434', light: '#ffffff' }
       })
+
+      if (vigente) qrDataUrl.value = dataUrl
     } catch {
-      qrDataUrl.value = ''
+      if (vigente) qrDataUrl.value = ''
     }
   },
-  { immediate: true }
+  { immediate: true, flush: 'sync' }
 )
 
 async function handleDownload() {
-  if (!props.ticket || downloading.value) return
+  if (!props.ticket || !showQr.value || downloading.value) return
   downloading.value = true
   try {
     await downloadVoucherPng({
@@ -95,7 +110,7 @@ async function handleDownload() {
         </button>
 
         <button
-          v-if="isValid"
+          v-if="showQr"
           type="button"
           class="voucher-nav__action"
           :disabled="downloading"
@@ -165,7 +180,7 @@ async function handleDownload() {
 
           <!-- QR + TCK debajo del QR -->
           <div class="voucher-ticket__qr-area">
-            <div v-if="isValid && qrDataUrl" class="voucher-ticket__qr-frame">
+            <div v-if="showQr" class="voucher-ticket__qr-frame">
               <img :src="qrDataUrl" alt="Código QR de entrada" width="215" height="215" />
             </div>
 
@@ -176,7 +191,9 @@ async function handleDownload() {
                 {{
                   isUsed
                     ? 'Esta entrada ya registró su ingreso en puerta.'
-                    : 'Esta entrada fue anulada y no es válida para ingresar.'
+                    : isCanceled
+                      ? 'Esta entrada fue anulada y no es válida para ingresar.'
+                      : 'No hay un código QR disponible para esta entrada.'
                 }}
               </span>
             </div>
@@ -185,7 +202,7 @@ async function handleDownload() {
           </div>
 
           <!-- Banner morado suave -->
-          <div v-if="isValid" class="voucher-ticket__hint-box">
+          <div v-if="showQr" class="voucher-ticket__hint-box">
             <strong>Presenta este código QR al ingresar al evento</strong>
             <span>Solo válido para 1 persona</span>
           </div>
@@ -213,7 +230,7 @@ async function handleDownload() {
       </q-card>
 
       <!-- Nota inferior fuera de la tarjeta -->
-      <p v-if="isValid" class="voucher-shell__tip">
+      <p v-if="showQr" class="voucher-shell__tip">
         Mantén el brillo de tu pantalla al máximo al mostrar el QR.
       </p>
     </div>

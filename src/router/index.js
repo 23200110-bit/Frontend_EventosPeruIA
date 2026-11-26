@@ -14,7 +14,7 @@ const router = createRouter({
           name: 'home',
           component: () => import('@/pages/public/Explore.vue')
         },
-        // Inicio y Explorar eran la misma pantalla: se conserva solo "/"
+        // Inicio y Explorar comparten la ruta "/"
         { path: 'explorar', redirect: '/' },
         {
           path: 'evento/:id',
@@ -74,7 +74,7 @@ const router = createRouter({
           component: () => import('@/pages/user/Notifications.vue'),
           meta: { auth: true }
         },
-        //HU-12: check-in SANTIAGO
+        // HU-12: check-in Santiago
         {
           path: 'organizador/asistentes',
           name: 'organizer-attendees',
@@ -87,14 +87,21 @@ const router = createRouter({
           component: () => import('@/pages/organizer/CheckIn.vue'),
           meta: { auth: true, noAdmin: true }
         },
-        //HU-08: Mis eventos y Crear/Editar evento ANYELO
+        // HU-08: Mis eventos y Crear/Editar evento Anyelo
         {
           path: 'organizador/mis-eventos',
           name: 'organizer-events',
           component: () => import('@/pages/organizer/MyEvents.vue'),
           meta: { auth: true, noAdmin: true }
         },
-        //RESEÑAR SANTIAGO
+        // HU-15: reportes de ventas
+        {
+          path: 'organizador/reportes',
+          name: 'organizer-reports',
+          component: () => import('@/pages/organizer/OrganizerDashboard.vue'),
+          meta: { auth: true, noAdmin: true }
+        },
+        // Reseñas Santiago
         {
           path: 'resenar/:eventoId',
           name: 'review-event',

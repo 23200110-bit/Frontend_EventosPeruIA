@@ -177,8 +177,9 @@ async function send(value = chatState.value.draft) {
         </p>
       </div>
       <q-btn
-        outline
-        color="primary"
+        unelevated
+        color="white"
+        text-color="primary"
         no-caps
         icon="add"
         label="Nueva conversación"

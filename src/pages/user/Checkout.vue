@@ -134,28 +134,52 @@ onBeforeUnmount(() => {
       <h1 class="page-heading">{{ event.name }}</h1>
       <p class="muted">{{ date(event.startDate) }} · {{ event.venue || event.address }}, {{ event.city }}</p>
 
-      <section v-if="purchase" class="surface form-stack" role="status">
-        <h2>¡Compra confirmada!</h2>
-        <p>
-          Compraste <strong>{{ purchase.cantidad }}</strong>
-          {{ purchase.cantidad === 1 ? 'entrada' : 'entradas' }} por
-          <strong>{{ money(purchase.montoTotal, purchase.moneda) }}</strong>.
-        </p>
-        <ul>
-          <li v-for="ticket in purchase.entradas" :key="ticket.entradaId">
-            Entrada <strong>{{ ticket.codigoCorto }}</strong>
-          </li>
-        </ul>
-        <p class="muted">Quedan {{ available }} cupos disponibles para este evento.</p>
-        <div class="row q-gutter-sm">
-          <q-btn unelevated no-caps color="primary" label="Ver mis entradas" to="/entradas" />
-          <q-btn
-            v-if="onSale && available > 0"
-            flat
-            no-caps
-            label="Comprar más entradas"
-            @click="buyMore"
-          />
+      <section v-if="purchase" class="surface" role="status">
+        <div class="row items-center q-col-gutter-lg">
+          <div class="col-12" :class="{ 'col-md-7': event.imageUrl?.trim() }">
+            <h2 class="text-h4 text-weight-bold q-mt-none q-mb-md">¡Compra confirmada!</h2>
+
+            <p>
+              Compraste <strong>{{ purchase.cantidad }}</strong>
+              {{ purchase.cantidad === 1 ? 'entrada' : 'entradas' }} por
+              <strong>{{ money(purchase.montoTotal, purchase.moneda) }}</strong>.
+            </p>
+
+            <ul class="q-pl-lg">
+              <li v-for="ticket in purchase.entradas" :key="ticket.entradaId">
+                Entrada <strong>{{ ticket.codigoCorto }}</strong>
+              </li>
+            </ul>
+
+            <p class="muted q-mb-md">Quedan {{ available }} cupos disponibles para este evento.</p>
+
+            <div class="row q-gutter-sm">
+              <q-btn unelevated no-caps color="primary" label="Ver mis entradas" to="/entradas" />
+              <q-btn
+                v-if="onSale && available > 0"
+                flat
+                no-caps
+                label="Comprar más entradas"
+                @click="buyMore"
+              />
+            </div>
+          </div>
+
+          <div v-if="event.imageUrl?.trim()" class="col-12 col-md-5">
+            <q-img
+              :src="event.imageUrl.trim()"
+              :alt="'Portada de ' + event.name"
+              :ratio="16 / 10"
+              fit="cover"
+              style="border-radius: 16px"
+            >
+              <template #error>
+                <div class="absolute-full flex flex-center bg-grey-2 text-grey-8">
+                  Portada no disponible
+                </div>
+              </template>
+            </q-img>
+          </div>
         </div>
       </section>
 

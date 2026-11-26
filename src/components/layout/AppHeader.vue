@@ -36,7 +36,7 @@ function logout() {
 </script>
 
 <template>
-  <q-header class="topbar">
+  <q-header class="topbar topbar--dark">
     <q-toolbar class="toolbar">
       <router-link to="/" class="brand">
         <span class="brand-mark">e.</span> eventos<span class="brand-peru">perú</span><small>IA</small>
@@ -150,6 +150,36 @@ function logout() {
 </template>
 
 <style scoped>
+.topbar--dark {
+  color: #f7f5ff;
+  background: #0a102b;
+  border-color: #313a69;
+}
+
+.topbar--dark :is(.brand, .desktop-nav a, .mobile-links a) {
+  color: #f7f5ff;
+}
+
+.topbar--dark .brand-peru {
+  color: #ffdaa8;
+}
+
+.topbar--dark .nav-pill-active {
+  color: #fff;
+  background: #2c3870;
+  border-color: #52629c;
+}
+
+@media (max-width: 1180px) {
+  .topbar--dark .desktop-nav {
+    display: none;
+  }
+
+  .topbar--dark .mobile-menu {
+    display: inline-flex;
+  }
+}
+
 .unread-dot {
   display: inline-flex;
   align-items: center;

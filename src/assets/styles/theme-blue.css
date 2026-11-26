@@ -5,10 +5,10 @@
 :root {
   --font-display: 'Lilita One', 'Arial Rounded MT Bold', 'Arial Black', Impact, sans-serif;
   --font-lead: 'Fjalla One', 'Arial Narrow', Impact, sans-serif;
-  --blue-deep: #04122f;
-  --blue-mid: #0a2a78;
-  --blue-bright: #1f5fe0;
-  --blue-wash: #f3f7ff;
+  --blue-deep: #0a102b;
+  --blue-mid: #202b64;
+  --blue-bright: #4b369b;
+  --blue-wash: #f4f1fb;
   --radius-lg: 22px;
   --shadow-soft: 0 1px 2px #231b3c0d, 0 10px 30px -12px #231b3c26;
 }

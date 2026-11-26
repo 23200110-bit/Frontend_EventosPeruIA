@@ -121,10 +121,11 @@ onMounted(loadMyEvents)
 
       <div class="row items-center q-gutter-sm">
         <q-btn
-          outline
+          unelevated
           rounded
           no-caps
-          color="primary"
+          color="white"
+          text-color="primary"
           icon="bar_chart"
           label="Reportes de ventas"
           :to="{ name: 'organizer-reports' }"
